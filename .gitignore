@@ -1,0 +1,10 @@
+# Ignore any artifact inside 'target' folder for git commit
+target/
+
+# Ignore below artifact inside 'target' folder for git commit
+.classpath
+.project
+.settings/
+
+# Ignore any file with extension '.log'
+*.log

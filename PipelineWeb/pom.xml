@@ -19,6 +19,11 @@
 			<artifactId>PipelineRepository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>PipelineScraper</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!-- Below External dependencies -->
 		<dependency>

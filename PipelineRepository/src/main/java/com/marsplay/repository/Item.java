@@ -1,4 +1,4 @@
-package com.marsplay.core;
+package com.marsplay.repository;
 
 import java.math.BigDecimal;
 

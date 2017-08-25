@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.marsplay.Application;
-
 public class Constants {
 	private static Properties prop;
 	static{
@@ -38,7 +36,7 @@ public class Constants {
 		InputStream input = null;
 
 		try {
-			input=Application.class.getClassLoader().getResourceAsStream("business.properties");
+			input=ScraperService.class.getClassLoader().getResourceAsStream("business.properties");
 			// load a properties file
 			prop.load(input);
 		} catch (IOException ex) {

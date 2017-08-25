@@ -1,38 +1,40 @@
-package com.marsplay;
+package com.marsplay.scraper;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Point;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
-import com.marsplay.scraper.Constants;
-import com.marsplay.scraper.Extractor;
-import com.marsplay.scraper.MyntraExtractor;
+import com.marsplay.repository.ItemRepository;
 
-public class Application {
-	private static ChromeDriverService seleniumService;
-	private static WebDriver driver ;
-	private static String query = "sunglasses men";
+@Component(value="scraperService")
+public class ScraperService implements CommandLineRunner {
+	private ChromeDriverService seleniumService;
+	private WebDriver driver ;
+	private String query = "sunglasses men";
 	
-	public static void main(String[] args) throws IOException, InterruptedException {
+	@Autowired
+	private ItemRepository itemRepository;
+	
+	@Override
+	public void run(String... arg0) throws Exception {
+		System.out.println("Commented ScraperService method here...................................");
+		System.out.println("......................................................................");
+		
+		startScraping();
+		
+	}
+	
+	public void startScraping() throws IOException, InterruptedException {
 		// TODO: Use DriverManager class here 
 		// TODO: This value should come from System variables set in startup script
 		String chromeDriver="C:\\Users\\smishra5\\Documents\\chromedriver.exe";
@@ -43,13 +45,20 @@ public class Application {
 		seleniumService.start();
 		driver = new RemoteWebDriver(seleniumService.getUrl(), DesiredCapabilities.chrome());
 		Properties props = Constants.getProps();
-	    driver.get(props.getProperty("endsite.myntra.url"));
-	    Timeouts timeouts = driver.manage().timeouts();
+		Timeouts timeouts = driver.manage().timeouts();
 	    timeouts.pageLoadTimeout(Long.parseLong(props.getProperty("endsite.common.page_load_timeout_seconds")), TimeUnit.SECONDS);
+		
+	    try {
+			driver.get(props.getProperty("endsite.myntra.url"));
+		} catch (org.openqa.selenium.TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	    driver.manage().window().maximize();
 	    Thread.sleep(1000);
 	    
-	    Extractor extractor = new MyntraExtractor(driver);
+	    Extractor extractor = new MyntraExtractor(driver, itemRepository);
+//	    extractor.setDriver(driver);
 	    extractor.searchAction(query);
 	    // TODO: Add Filter pattern here for Sorting and Add Myntra site Filters
 	    Thread.sleep(200);
@@ -59,9 +68,9 @@ public class Application {
 //	    seleniumService.stop();
 		System.out.println("Done.");
 		
-
 	
 	}
+
 
 
 }

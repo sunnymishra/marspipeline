@@ -12,24 +12,26 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.marsplay.repository.Item;
+import com.marsplay.repository.ItemRepository;
+
 @RestController
-@RequestMapping("/item")
+@RequestMapping("/items123")
 public class ItemRestController {
 	@Autowired
 	private ItemRepository itemRepository;
 
-//	@Autowired
-//	public BookmarkRestController(BookmarkRepository bookmarkRepository,
-//			AccountRepository accountRepository) {
-//		this.bookmarkRepository = bookmarkRepository;
-//		this.accountRepository = accountRepository;
-//	}
-
-//	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<?> getTest() {
+		System.out.println("Calling getTest API");
+		return ResponseEntity.noContent().build();
+	}
+	
+	@RequestMapping(method = RequestMethod.POST)
 //	public ResponseEntity<?> add(@PathVariable String accountId,
 	public ResponseEntity<?> add(@RequestBody Item input) {
 //		this.validateUser(accountId);
-		System.out.println("Inside POST");
+		System.out.println("Inside POST ##########################################");
 		URI location = null;
 //		try {
 			Item result = itemRepository.save(input);

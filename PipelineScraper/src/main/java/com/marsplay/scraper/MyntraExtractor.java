@@ -2,20 +2,25 @@ package com.marsplay.scraper;
 
 import java.util.List;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.marsplay.core.Item;
-//import com.marsplay.core.Item;
+import com.marsplay.repository.Item;
+import com.marsplay.repository.ItemRepository;
 import com.marsplay.scraper.Constants.ElementType;
 import com.marsplay.scraper.Constants.Endsites;
+import com.mongodb.DuplicateKeyException;
 
+//@Service
 public class MyntraExtractor extends Extractor {
-
-	public MyntraExtractor(WebDriver driver) {
+	ItemRepository itemRepository;
+	
+	public MyntraExtractor(WebDriver driver, ItemRepository itemRepository) {
 		super(driver);
+		this.itemRepository=itemRepository;
 		// PageFactory.initElements(driver, this);
 	}
 
@@ -93,6 +98,20 @@ public class MyntraExtractor extends Extractor {
 				}
 
 			}
+//			System.out.println(test1.getMessage("XXX"));
+			try {
+				itemRepository.save(itemVO);
+			} catch (Exception e) {
+				e.printStackTrace();
+				Throwable rootException = ExceptionUtils.getRootCause(e);
+				if(rootException instanceof DuplicateKeyException){
+					// Eat exception here else throw exception
+					System.out.println("Eating Mongo DuplicateKeyException here in Extractor");
+				}else{
+					throw e;
+				}
+				
+			}	// MongoDB save in ITEM collection
 			
 			if (scrollItemCount == -1)
 				scrollItemCount = Util.getNoOfItemsInEachRow(container

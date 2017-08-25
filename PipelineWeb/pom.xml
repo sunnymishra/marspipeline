@@ -1,0 +1,29 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.marsplay</groupId>
+		<artifactId>PipelineParent</artifactId>
+		<version>1.0.0</version>
+		<relativePath>../PipelineParent</relativePath>
+	</parent>
+
+	<artifactId>PipelineWeb</artifactId>
+	<description>Module contains Rest APIs</description>
+	<packaging>jar</packaging>
+
+	<dependencies>
+		<!-- Below own module dependencies -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>PipelineRepository</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- Below External dependencies -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-rest</artifactId>
+		</dependency>
+	</dependencies>
+</project>

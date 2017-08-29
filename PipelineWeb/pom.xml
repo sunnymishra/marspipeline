@@ -31,4 +31,27 @@
 			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<!-- <version>1.6.0</version> -->
+				<executions>
+					<execution>
+						<id>pipelineExec</id>
+						<!-- <phase>package</phase> -->
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.marsplay.core.Application</mainClass>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>

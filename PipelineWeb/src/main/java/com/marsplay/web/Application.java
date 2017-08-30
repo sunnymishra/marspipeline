@@ -6,10 +6,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication
-//(scanBasePackages = {"com.marsplay.scraper"})
-@ComponentScan({"com.marsplay.web", "com.marsplay.scraper", "com.marsplay.repository"})
-@EnableMongoRepositories (basePackages = {"com.marsplay.repository"})
+@SpringBootApplication(scanBasePackages = { "com.marsplay.web",
+		"com.marsplay.repository" })
+@EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
 public class Application {
 
 	public static void main(String[] args) throws Exception {

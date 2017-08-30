@@ -111,7 +111,7 @@ public abstract class Agent {
 		return path;
 	}
 
-	public String uploadFile(String imageUrl) throws IOException {
+	public Map<String, Object> uploadFile(String imageUrl) throws IOException {
 		// new PhotoUploadValidator().validate(photoUpload, result);
 		Map uploadResult = null;
 		uploadResult = CloudinarySingleton
@@ -120,6 +120,6 @@ public abstract class Agent {
 				.upload(imageUrl,
 						ObjectUtils.asMap("resource_type", "auto", "tags",
 								endsite));
-		return (String) uploadResult.get("secure_url");
+		return uploadResult;
 	}
 }

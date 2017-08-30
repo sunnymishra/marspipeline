@@ -1,6 +1,8 @@
 package com.marsplay.scraper.agents;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openqa.selenium.By;
@@ -10,9 +12,9 @@ import org.openqa.selenium.WebElement;
 
 import com.marsplay.repository.Item;
 import com.marsplay.repository.ItemRepository;
-import com.marsplay.scraper.lib.Util;
 import com.marsplay.scraper.lib.Constants.ElementType;
 import com.marsplay.scraper.lib.Constants.Endsites;
+import com.marsplay.scraper.lib.Util;
 import com.mongodb.DuplicateKeyException;
 
 //@Service
@@ -45,7 +47,7 @@ public class MyntraAgent extends Agent {
 			while (!isElementLoaded) {
 				try {
 					WebElement url = item.findElement(By.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.url")));
-					itemVO.setSiteUrl(url.getAttribute("href"));
+					itemVO.setEndsiteUrl(url.getAttribute("href"));
 					WebElement brand = item
 							.findElement(By
 									.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.brand")));
@@ -85,7 +87,7 @@ public class MyntraAgent extends Agent {
 						image = waitAndExtractElement(item, ElementType.XPATH,
 								businessProps.getProperty("endsite.myntra.relative.xpath.image2"));
 					}
-					itemVO.setImageUrl(image.getAttribute("src"));
+					itemVO.setEndsiteImageUrl(image.getAttribute("src"));
 
 					isElementLoaded = true;
 				} catch (org.openqa.selenium.NoSuchElementException e) {
@@ -101,7 +103,9 @@ public class MyntraAgent extends Agent {
 
 			}
 			try {
-				itemVO.setCdnImageUrl(uploadFile(itemVO.getImageUrl()));
+				Map<String, Object> responseMap = uploadFile(itemVO.getEndsiteImageUrl());
+				itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
+				itemVO.setCdnImageId((String) responseMap.get("public_id"));
 				itemRepository.save(itemVO);
 			} catch (Exception e) {
 				e.printStackTrace();

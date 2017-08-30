@@ -2,7 +2,6 @@ package com.marsplay.scraper;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -13,31 +12,44 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.utils.ObjectUtils;
 import com.marsplay.repository.ItemRepository;
 import com.marsplay.scraper.agents.Agent;
 import com.marsplay.scraper.agents.MyntraAgent;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
 
-@Component(value="scraperService")
+@SpringBootApplication
+ (scanBasePackages = { "com.marsplay.scraper", "com.marsplay.repository" })
+@EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
 public class ScraperService implements CommandLineRunner {
 	private ChromeDriverService seleniumService;
 	private WebDriver driver;
 	private String query = "sunglasses men";
-	Properties businessProps = Constants.getBusinessProps();
-	Properties applicationProps = Constants.getApplicationProps();
+	Properties businessProps;
+	Properties applicationProps;
 
 	@Autowired
 	private ItemRepository itemRepository;
 
+	public static void main(String[] args) throws Exception {
+		System.out.println("Spring boot starting....");
+		ConfigurableApplicationContext context = SpringApplication.run(
+				ScraperService.class, args);
+		System.out.println("Scraper Spring boot started....");
+	}
+
 	@Override
 	public void run(String... arg0) throws Exception {
 		System.out.println("#######Inside ScraperService method now ########");
-
+		 businessProps = Constants.getBusinessProps();
+		 applicationProps = Constants.getApplicationProps();
 		startScraping();
 
 	}
@@ -48,10 +60,9 @@ public class ScraperService implements CommandLineRunner {
 		if (cloudinaryUrl != null && cloudinaryUrl != "")
 			CloudinarySingleton
 					.registerCloudinary(new Cloudinary(cloudinaryUrl));
-		// Note: If application.properties doesn't have cloudinary url, 
+		// Note: If application.properties doesn't have cloudinary url,
 		// then CoudinarySingleton will expect and fetch it from JVM args
-		
-		
+
 		// TODO: Use DriverManager class here
 		// TODO: This value should come from System variables set in startup
 		// script

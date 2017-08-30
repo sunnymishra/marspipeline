@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>com.marsplay</groupId>
-		<artifactId>PipelineParent</artifactId>
+		<artifactId>KafkaParent</artifactId>
 		<version>1.0.0</version>
-		<relativePath>../PipelineParent</relativePath>
+		<relativePath>../KafkaParent</relativePath>
 	</parent>
 
 	<artifactId>PipelineScraper</artifactId>
@@ -15,9 +15,9 @@
 	<dependencies>
 		<!-- Below own module dependencies -->
 		<dependency>
-			<groupId>${project.groupId}</groupId>
+			<groupId>com.marsplay</groupId>
 			<artifactId>PipelineRepository</artifactId>
-			<version>${project.version}</version>
+			<version>1.0.0</version>
 		</dependency>
 
 		<!-- Below External dependencies -->
@@ -43,4 +43,27 @@
 			<version>1.14.0</version>
 		</dependency> -->
 	</dependencies>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<!-- <version>1.6.0</version> -->
+				<executions>
+					<execution>
+						<id>pipelineExec</id>
+						<!-- <phase>package</phase> -->
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>com.marsplay.scraper.ScraperService</mainClass>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+	</build>
 </project>

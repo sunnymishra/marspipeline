@@ -10,8 +10,9 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(collectionResourceRel = "item", path = "item")
 public interface ItemRepository extends MongoRepository<Item, String> {
     Collection<Item> findByBrand(@Param("brand") String brand);
-    Optional<Item> findByImageUrl(@Param("imageUrl")String imageUrl);
+    Optional<Item> findByEndsiteUrl(@Param("endsiteUrl")String endsiteUrl);
     
+//    Below will fetch value from Referenced Collection
 //    Collection<Item> findByBookmarkName(String name);
 }
 

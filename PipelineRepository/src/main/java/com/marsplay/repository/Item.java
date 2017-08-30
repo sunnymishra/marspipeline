@@ -1,11 +1,14 @@
 package com.marsplay.repository;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 
 @Document(collection="item")
@@ -19,27 +22,37 @@ public class Item {
     private String name;
     private String brand;
     private String endSite;
-    @Field("siteUrl")
+    @Field("endsiteUrl")
     @Indexed(unique = true)
-    private String siteUrl;
+    private String endsiteUrl;
     
-    private String imageUrl;
+    private String endsiteImageUrl;
     private String cdnImageUrl;
+    private String cdnImageId;
     private BigDecimal price;	// Wanted to try Decimal128
+    
+    @Field
+    @DateTimeFormat(iso = ISO.DATE_TIME)
+    private Date createdDate = new Date();
     
 	public Item() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Item(String name, String brand, String endSite, String siteUrl, String imageUrl, BigDecimal price) {
+	public Item(String name, String brand, String endSite, String endsiteUrl,
+			String endsiteImageUrl, String cdnImageUrl, String cdnImageId,
+			BigDecimal price, Date createdDate) {
 		super();
 		this.name = name;
 		this.brand = brand;
 		this.endSite = endSite;
-		this.siteUrl = siteUrl;
-		this.imageUrl = imageUrl;
+		this.endsiteUrl = endsiteUrl;
+		this.endsiteImageUrl = endsiteImageUrl;
+		this.cdnImageUrl = cdnImageUrl;
+		this.cdnImageId = cdnImageId;
 		this.price = price;
+		this.createdDate = createdDate;
 	}
 
 	public String getId() {
@@ -62,21 +75,14 @@ public class Item {
 		this.brand = brand;
 	}
 
-	public String getSiteUrl() {
-		return siteUrl;
+	public String getEndsiteUrl() {
+		return endsiteUrl;
 	}
 
-	public void setSiteUrl(String siteUrl) {
-		this.siteUrl = siteUrl;
+	public void setEndsiteUrl(String endsiteUrl) {
+		this.endsiteUrl = endsiteUrl;
 	}
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
 
 	public String getCdnImageUrl() {
 		return cdnImageUrl;
@@ -102,12 +108,40 @@ public class Item {
 		this.price = price;
 	}
 
+	public Date getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(Date createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public String getEndsiteImageUrl() {
+		return endsiteImageUrl;
+	}
+
+	public void setEndsiteImageUrl(String endsiteImageUrl) {
+		this.endsiteImageUrl = endsiteImageUrl;
+	}
+
+	public String getCdnImageId() {
+		return cdnImageId;
+	}
+
+	public void setCdnImageId(String cdnImageId) {
+		this.cdnImageId = cdnImageId;
+	}
+
 	@Override
 	public String toString() {
 		return "Item [id=" + id + ", name=" + name + ", brand=" + brand
-				+ ", endSite=" + endSite + ", siteUrl=" + siteUrl
-				+ ", imageUrl=" + imageUrl + ", price=" + price + "]";
+				+ ", endSite=" + endSite + ", endsiteUrl=" + endsiteUrl
+				+ ", endsiteImageUrl=" + endsiteImageUrl + ", cdnImageUrl="
+				+ cdnImageUrl + ", cdnImageId=" + cdnImageId + ", price="
+				+ price + ", createdDate=" + createdDate + "]";
 	}
+
+
 
 	
 

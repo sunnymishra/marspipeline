@@ -19,7 +19,7 @@
 			<artifactId>PipelineRepository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Below External dependencies -->
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
@@ -31,6 +31,16 @@
 			<artifactId>selenium-chrome-driver</artifactId>
 			<version>3.4.0</version>
 		</dependency>
-
+		<!-- For connecting to CDN server -->
+		<dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-http44</artifactId>
+			<version>1.14.0</version>
+		</dependency>
+		<!-- <dependency>
+			<groupId>com.cloudinary</groupId>
+			<artifactId>cloudinary-taglib</artifactId>
+			<version>1.14.0</version>
+		</dependency> -->
 	</dependencies>
 </project>

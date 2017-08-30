@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marsplay.scraper.agents;
 
 import java.util.List;
 
@@ -10,26 +10,28 @@ import org.openqa.selenium.WebElement;
 
 import com.marsplay.repository.Item;
 import com.marsplay.repository.ItemRepository;
-import com.marsplay.scraper.Constants.ElementType;
-import com.marsplay.scraper.Constants.Endsites;
+import com.marsplay.scraper.lib.Util;
+import com.marsplay.scraper.lib.Constants.ElementType;
+import com.marsplay.scraper.lib.Constants.Endsites;
 import com.mongodb.DuplicateKeyException;
 
 //@Service
-public class MyntraExtractor extends Extractor {
+public class MyntraAgent extends Agent {
 	ItemRepository itemRepository;
 	
-	public MyntraExtractor(WebDriver driver, ItemRepository itemRepository) {
+	public MyntraAgent(WebDriver driver, ItemRepository itemRepository) {
 		super(driver);
 		this.itemRepository=itemRepository;
+		this.endsite=Endsites.MYNTRA;
 		// PageFactory.initElements(driver, this);
 	}
 
 	@Override
-	public void scrapeAction() throws InterruptedException {
+	public void scrapeAction() throws Exception {
 		WebElement container = driver.findElement(By
-				.xpath(props.getProperty("endsite.myntra.xpath.container")));
+				.xpath(businessProps.getProperty("endsite.myntra.xpath.container")));
 		List<WebElement> itemContainer = driver.findElements(By
-				.xpath(props.getProperty("endsite.myntra.xpath.item")));
+				.xpath(businessProps.getProperty("endsite.myntra.xpath.item")));
 		int counter = 0;
 		int scrollHeight = -1, scrollItemCount = -1;
 		for (WebElement item : itemContainer) {
@@ -42,17 +44,17 @@ public class MyntraExtractor extends Extractor {
 			boolean isElementLoaded = false;
 			while (!isElementLoaded) {
 				try {
-					WebElement url = item.findElement(By.xpath(props.getProperty("endsite.myntra.relative.xpath.url")));
+					WebElement url = item.findElement(By.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.url")));
 					itemVO.setSiteUrl(url.getAttribute("href"));
 					WebElement brand = item
 							.findElement(By
-									.xpath(props.getProperty("endsite.myntra.relative.xpath.brand")));
+									.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.brand")));
 					itemVO.setBrand(brand.getText());
 					// WebElement element =
 					// 	webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("periodicElement")));
 					WebElement name = item
 							.findElement(By
-									.xpath(props.getProperty("endsite.myntra.relative.xpath.name")));
+									.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.name")));
 					itemVO.setName(name.getText());
 					System.out.println(itemVO);
 
@@ -60,11 +62,11 @@ public class MyntraExtractor extends Extractor {
 					try {
 						price = item
 								.findElement(By
-										.xpath(props.getProperty("endsite.myntra.relative.xpath.price1")));
+										.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.price1")));
 					} catch (org.openqa.selenium.NoSuchElementException e) {
 						price = item
 								.findElement(By
-										.xpath(props.getProperty("endsite.myntra.relative.xpath.price2")));
+										.xpath(businessProps.getProperty("endsite.myntra.relative.xpath.price2")));
 					}
 					try {
 						itemVO.setPrice(Util.formatMyntraPrice(price.getText()));
@@ -78,10 +80,10 @@ public class MyntraExtractor extends Extractor {
 						// Image load may take time, therefore using Selenium
 						// FluentWait API below
 						image = waitAndExtractElement(item, ElementType.XPATH,
-								props.getProperty("endsite.myntra.relative.xpath.image1"));
+								businessProps.getProperty("endsite.myntra.relative.xpath.image1"));
 					} catch (org.openqa.selenium.NoSuchElementException e) {
 						image = waitAndExtractElement(item, ElementType.XPATH,
-								props.getProperty("endsite.myntra.relative.xpath.image2"));
+								businessProps.getProperty("endsite.myntra.relative.xpath.image2"));
 					}
 					itemVO.setImageUrl(image.getAttribute("src"));
 
@@ -93,13 +95,13 @@ public class MyntraExtractor extends Extractor {
 					// Flagging Scraping error
 					isElementLoaded = false;
 					retry++;
-					if (retry >= Integer.parseInt(props.getProperty("endsite.common.element_fetch_retry_max")))
+					if (retry >= Integer.parseInt(businessProps.getProperty("endsite.common.element_fetch_retry_max")))
 						throw e;
 				}
 
 			}
-//			System.out.println(test1.getMessage("XXX"));
 			try {
+				itemVO.setCdnImageUrl(uploadFile(itemVO.getImageUrl()));
 				itemRepository.save(itemVO);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -121,10 +123,10 @@ public class MyntraExtractor extends Extractor {
 				JavascriptExecutor jse = (JavascriptExecutor) driver;
 				if (scrollHeight == -1)
 					scrollHeight = Util.ceilPixel(item.getSize().getHeight(),
-							Integer.parseInt(props.getProperty("endsite.common.vertical_scroll_offset_pixel")));
+							Integer.parseInt(businessProps.getProperty("endsite.common.vertical_scroll_offset_pixel")));
 				jse.executeScript("window.scrollBy(0," + scrollHeight + ")", "");
 			}
-			if (counter >= Integer.parseInt(props.getProperty("endsite.common.no_of_items_to_scrape")))
+			if (counter >= Integer.parseInt(businessProps.getProperty("endsite.common.no_of_items_to_scrape")))
 				break;
 
 		}

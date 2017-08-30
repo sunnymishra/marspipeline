@@ -1,4 +1,4 @@
-package com.marsplay.core;
+package com.marsplay.web;
 
 import java.net.URI;
 import java.util.Optional;
@@ -16,7 +16,7 @@ import com.marsplay.repository.Item;
 import com.marsplay.repository.ItemRepository;
 
 @RestController
-@RequestMapping("/items123")
+@RequestMapping("/item")
 public class ItemRestController {
 	@Autowired
 	private ItemRepository itemRepository;

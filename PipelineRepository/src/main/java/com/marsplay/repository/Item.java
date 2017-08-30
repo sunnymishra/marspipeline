@@ -24,6 +24,7 @@ public class Item {
     private String siteUrl;
     
     private String imageUrl;
+    private String cdnImageUrl;
     private BigDecimal price;	// Wanted to try Decimal128
     
 	public Item() {
@@ -75,6 +76,14 @@ public class Item {
 
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
+	}
+
+	public String getCdnImageUrl() {
+		return cdnImageUrl;
+	}
+
+	public void setCdnImageUrl(String cdnImageUrl) {
+		this.cdnImageUrl = cdnImageUrl;
 	}
 
 	public String getEndSite() {

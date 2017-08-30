@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marsplay.scraper.lib;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marsplay.scraper.lib;
 
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Properties;
 
 public class Util {
-	private static Properties props = Constants.getProps();
+	private static Properties props = Constants.getBusinessProps();
 	/**
 	 * Myntra Scraped Price eg. "Rs. 500". This Util method
 	 * trims the String and strips Alphabets 'Rs.' and then

@@ -1,4 +1,4 @@
-package com.marsplay.core;
+package com.marsplay.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 
 @SpringBootApplication
 //(scanBasePackages = {"com.marsplay.scraper"})
-@ComponentScan({"com.marsplay.core", "com.marsplay.scraper", "com.marsplay.repository"})
+@ComponentScan({"com.marsplay.web", "com.marsplay.scraper", "com.marsplay.repository"})
 @EnableMongoRepositories (basePackages = {"com.marsplay.repository"})
 public class Application {
 

@@ -10,12 +10,13 @@ import org.openqa.selenium.WebDriver.Timeouts;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 import com.cloudinary.Cloudinary;
@@ -25,10 +26,11 @@ import com.marsplay.scraper.agents.MyntraAgent;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
 
-@SpringBootApplication
- (scanBasePackages = { "com.marsplay.scraper", "com.marsplay.repository" })
+@SpringBootApplication(scanBasePackages = { "com.marsplay.scraper",
+		"com.marsplay.repository" })
 @EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
 public class ScraperService implements CommandLineRunner {
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScraperService.class);
 	private ChromeDriverService seleniumService;
 	private WebDriver driver;
 	private String query = "sunglasses men";
@@ -39,18 +41,18 @@ public class ScraperService implements CommandLineRunner {
 	private ItemRepository itemRepository;
 
 	public static void main(String[] args) throws Exception {
-		System.out.println("Spring boot starting....");
+		LOGGER.info("Spring boot starting....");
 		ConfigurableApplicationContext context = SpringApplication.run(
 				ScraperService.class, args);
-		System.out.println("Scraper Spring boot started....");
+		LOGGER.info("Scraper Spring boot started='{}'", "Successfully");
 	}
 
 	@Override
 	public void run(String... arg0) throws Exception {
 		System.out.println("#######Inside ScraperService method now ########");
-		 businessProps = Constants.getBusinessProps();
-		 applicationProps = Constants.getApplicationProps();
-		startScraping();
+		businessProps = Constants.getBusinessProps();
+		applicationProps = Constants.getApplicationProps();
+//		startScraping();
 
 	}
 
@@ -103,7 +105,7 @@ public class ScraperService implements CommandLineRunner {
 
 		// driver.quit();
 		// seleniumService.stop();
-		System.out.println("Done.");
+		LOGGER.info("Done.");
 
 	}
 

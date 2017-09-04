@@ -1,0 +1,10 @@
+#spring:
+#	kafka:
+#    	consumer:
+#      		auto-offset-reset: earliest
+#      		group-id: boot
+#
+#kafka:
+#	bootstrap-servers: localhost:9092
+#  	topic:
+#    	scrape: scrape.t

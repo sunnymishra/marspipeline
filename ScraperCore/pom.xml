@@ -8,9 +8,13 @@
 		<relativePath>../KafkaParent</relativePath>
 	</parent>
 
-	<artifactId>PipelineScraper</artifactId>
+	<artifactId>ScraperCore</artifactId>
 	<description>Module scrapes Endsites</description>
 	<packaging>jar</packaging>
+
+	<properties>
+		<spring-kafka.version>1.2.2.RELEASE</spring-kafka.version>
+	</properties>
 
 	<dependencies>
 		<!-- Below own module dependencies -->
@@ -37,13 +41,35 @@
 			<artifactId>cloudinary-http44</artifactId>
 			<version>1.14.0</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>com.cloudinary</groupId>
-			<artifactId>cloudinary-taglib</artifactId>
-			<version>1.14.0</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>com.cloudinary</groupId> <artifactId>cloudinary-taglib</artifactId> 
+			<version>1.14.0</version> </dependency> -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
+			<version>${spring-kafka.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka-test</artifactId>
+			<version>${spring-kafka.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<!-- <version>2.6.7</version> -->
+		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 			<plugin>

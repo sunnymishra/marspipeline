@@ -5,7 +5,7 @@
 	<artifactId>KafkaParent</artifactId>
 	<version>1.0.0</version>
 	<packaging>pom</packaging>
-	<name>KafkaParent</name>
+	<name>ScraperParent</name>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -21,7 +21,7 @@
 	</properties>
 
 	<modules>
-		<module>../PipelineScraper</module>
+		<module>../ScraperCore</module>
 	</modules>
 
 	<dependencies>
@@ -30,8 +30,8 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.2</version>
 		</dependency>
-
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>

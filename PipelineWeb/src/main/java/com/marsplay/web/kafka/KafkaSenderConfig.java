@@ -1,4 +1,4 @@
-package com.marsplay.scraper.kafka;
+package com.marsplay.web.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,10 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
+import com.marsplay.repository.Job;
+
 @Configuration
-public class SenderConfig {
+public class KafkaSenderConfig {
 
   @Value("${kafka.bootstrap-servers}")
   private String bootstrapServers;

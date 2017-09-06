@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
+import com.marsplay.repository.Job;
+
 @Component
-public class Sender {
-	  private static final Logger LOGGER = LoggerFactory.getLogger(Sender.class);
+public class TestKafkaSender {
+	  private static final Logger LOGGER = LoggerFactory.getLogger(TestKafkaSender.class);
 
 	  @Autowired
 	  private KafkaTemplate<String, Job> kafkaTemplate;

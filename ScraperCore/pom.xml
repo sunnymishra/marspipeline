@@ -78,7 +78,7 @@
 				<!-- <version>1.6.0</version> -->
 				<executions>
 					<execution>
-						<id>pipelineExec</id>
+						<id>scraperExec</id>
 						<!-- <phase>package</phase> -->
 						<goals>
 							<goal>java</goal>

@@ -5,6 +5,7 @@ import java.util.Date;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,18 +15,19 @@ import org.springframework.format.annotation.DateTimeFormat.ISO;
 @Document(collection="item")
 public class Item {
 
-//    @DBRef
-//    private Bookmark bookmark;
-
 	@Id
     private String id;
-    private String name;
-    private String brand;
-    private String endSite;
-    @Field("endsiteUrl")
+	
+	@Field("endsiteUrl")
     @Indexed(unique = true)
     private String endsiteUrl;
     
+    @DBRef
+    private Job job;
+    
+    private String name;
+    private String brand;
+    private String endSite;
     private String endsiteImageUrl;
     private String cdnImageUrl;
     private String cdnImageId;
@@ -35,19 +37,17 @@ public class Item {
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate = new Date();
     
-	public Item() {
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	public Item() {}
 
-	public Item(String name, String brand, String endSite, String endsiteUrl,
+	public Item(String endsiteUrl, Job job, String name, String brand, String endSite, 
 			String endsiteImageUrl, String cdnImageUrl, String cdnImageId,
 			BigDecimal price, Date createdDate) {
 		super();
+		this.endsiteUrl = endsiteUrl;
+		this.job = job;
 		this.name = name;
 		this.brand = brand;
 		this.endSite = endSite;
-		this.endsiteUrl = endsiteUrl;
 		this.endsiteImageUrl = endsiteImageUrl;
 		this.cdnImageUrl = cdnImageUrl;
 		this.cdnImageId = cdnImageId;

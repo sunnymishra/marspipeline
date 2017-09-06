@@ -10,11 +10,13 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
+import com.marsplay.repository.Job;
+
 @Component
-public class Receiver {
+public class KafkaReceiver {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(Receiver.class);
+			.getLogger(KafkaReceiver.class);
 
 	private CountDownLatch latch = new CountDownLatch(1);
 
@@ -26,7 +28,8 @@ public class Receiver {
 	public void receive(@Payload Job job, 
 			  @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition){
 //	public void doSomething(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload String payload) {
-		LOGGER.info("received payload='{}', partitionId='{}', key='{}'", job, partition);
+		LOGGER.info("#################################################################################"
+				+ "received payload='{}', partitionId='{}', key='{}'", job, partition);
 		latch.countDown();
 	}
 	

@@ -2,8 +2,11 @@ package com.marsplay.scraper;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PreDestroy;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriver.Timeouts;
@@ -14,49 +17,44 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.stereotype.Component;
 
 import com.cloudinary.Cloudinary;
 import com.marsplay.repository.ItemRepository;
+import com.marsplay.repository.Job;
+import com.marsplay.repository.JobRepository;
+import com.marsplay.repository.lib.Constants.JobStatus;
 import com.marsplay.scraper.agents.Agent;
 import com.marsplay.scraper.agents.MyntraAgent;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
 
-@SpringBootApplication(scanBasePackages = { "com.marsplay.scraper",
-		"com.marsplay.repository" })
-@EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
+@Component
 public class ScraperService implements CommandLineRunner {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ScraperService.class);
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(ScraperService.class);
 	private ChromeDriverService seleniumService;
 	private WebDriver driver;
-	private String query = "sunglasses men";
+	// private String query = "sunglasses men";
 	Properties businessProps;
 	Properties applicationProps;
+	Agent extractor = null;
 
 	@Autowired
 	private ItemRepository itemRepository;
-
-	public static void main(String[] args) throws Exception {
-		LOGGER.info("Spring boot starting....");
-		ConfigurableApplicationContext context = SpringApplication.run(
-				ScraperService.class, args);
-		LOGGER.info("Scraper Spring boot started='{}'", "Successfully");
-	}
-
+	@Autowired
+	private JobRepository jobRepository;
+	
 	@Override
 	public void run(String... arg0) throws Exception {
 		System.out.println("#######Inside ScraperService method now ########");
 		businessProps = Constants.getBusinessProps();
 		applicationProps = Constants.getApplicationProps();
-//		startScraping();
-
+		initChrome();
+		launchEndsite();
 	}
 
-	public void startScraping() throws IOException, InterruptedException {
+	private void initChrome() throws IOException {
 		String cloudinaryUrl = applicationProps
 				.getProperty("cloudinary.connection.url");
 		if (cloudinaryUrl != null && cloudinaryUrl != "")
@@ -74,39 +72,55 @@ public class ScraperService implements CommandLineRunner {
 				.usingDriverExecutable(new File(chromeDriver))
 				.usingAnyFreePort().build();
 		seleniumService.start();
+	}
+
+	private void launchEndsite() throws InterruptedException {
 		driver = new RemoteWebDriver(seleniumService.getUrl(),
 				DesiredCapabilities.chrome());
-		// Properties props = Constants.getBusinessProps();
+
 		Timeouts timeouts = driver.manage().timeouts();
 		timeouts.pageLoadTimeout(Long.parseLong(businessProps
-				.getProperty("endsite.common.page_load_timeout_seconds")),
+				.getProperty("common.page_load_timeout_seconds")),
 				TimeUnit.SECONDS);
-
 		try {
-			driver.get(businessProps.getProperty("endsite.myntra.url"));
+			driver.get(businessProps.getProperty("myntra.url"));
 		} catch (org.openqa.selenium.TimeoutException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		driver.manage().window().maximize();
+		extractor = new MyntraAgent(driver, itemRepository);
+		// TODO: See that we can avoid putting this constructor inside
+		// startScraping(),else multiple objects will be created needlessly
 		Thread.sleep(1000);
+	}
 
-		Agent extractor = new MyntraAgent(driver, itemRepository);
-		// extractor.setDriver(driver);
-		extractor.searchAction(query);
+	public void startScraping(Job job) throws IOException, InterruptedException {
+		extractor.searchAction(job.getMessage());
 		// TODO: Add Filter pattern here for Sorting and Add Myntra site Filters
 		Thread.sleep(200);
 		try {
-			extractor.scrapeAction();
+			job.setStatus(JobStatus.INPROGRESS.name());
+			job.setUpdatedDate(new Date());
+			jobRepository.save(job);
+			
+			extractor.scrapeAction(job);
+			
+			job.setStatus(JobStatus.FINISHED.name());
+			job.setUpdatedDate(new Date());
+			jobRepository.save(job);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		// driver.quit();
-		// seleniumService.stop();
-		LOGGER.info("Done.");
-
+		LOGGER.info("Existing startScraping() method.");
 	}
 
+	@PreDestroy
+	public void cleanUp() throws Exception {
+		LOGGER.info("Killing Selenium driver instances and SeleniymService, before Spring destroys ScraperService Bean");
+		driver.quit();
+		seleniumService.stop();
+	}
 }

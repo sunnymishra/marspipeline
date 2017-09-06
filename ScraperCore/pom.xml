@@ -84,7 +84,7 @@
 							<goal>java</goal>
 						</goals>
 						<configuration>
-							<mainClass>com.marsplay.scraper.ScraperService</mainClass>
+							<mainClass>com.marsplay.scraper.SpringScraperApp</mainClass>
 						</configuration>
 					</execution>
 				</executions>

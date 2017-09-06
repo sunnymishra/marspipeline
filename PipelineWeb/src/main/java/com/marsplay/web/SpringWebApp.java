@@ -9,12 +9,12 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @SpringBootApplication(scanBasePackages = { "com.marsplay.web",
 		"com.marsplay.repository" })
 @EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
-public class Application {
+public class SpringWebApp {
 
 	public static void main(String[] args) throws Exception {
 		System.out.println("Spring boot starting....");
 		ConfigurableApplicationContext context = SpringApplication.run(
-				Application.class, args);
+				SpringWebApp.class, args);
 		// CommandLineRunner scraperService =
 		// context.getBean(ScraperService.class);
 		System.out.println("Spring boot started....");

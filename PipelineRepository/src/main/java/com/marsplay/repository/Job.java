@@ -13,10 +13,15 @@ public class Job {
 	@Id
 	private String id;
 	private String message;
+	private String status;
 	
 	@Field
     @DateTimeFormat(iso = ISO.DATE_TIME)
     private Date createdDate = new Date();
+	
+	@Field
+    @DateTimeFormat(iso = ISO.DATE_TIME)
+    private Date updatedDate = new Date();
 	
 	public Job() {}
 
@@ -41,12 +46,27 @@ public class Job {
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
-	
+	public Date getUpdatedDate() {
+		return updatedDate;
+	}
+	public void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
-		return "Job [id=" + id + ", message=" + message + ", createdDate="
-				+ createdDate + "]";
+		return "Job [id=" + id + ", message=" + message + ", status=" + status
+				+ ", createdDate=" + createdDate + ", updatedDate="
+				+ updatedDate + "]";
 	}
+
 	
+
 	
 }

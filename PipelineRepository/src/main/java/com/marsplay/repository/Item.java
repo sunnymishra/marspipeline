@@ -132,14 +132,23 @@ public class Item {
 		this.cdnImageId = cdnImageId;
 	}
 
+	public Job getJob() {
+		return job;
+	}
+
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
 	@Override
 	public String toString() {
-		return "Item [id=" + id + ", name=" + name + ", brand=" + brand
-				+ ", endSite=" + endSite + ", endsiteUrl=" + endsiteUrl
-				+ ", endsiteImageUrl=" + endsiteImageUrl + ", cdnImageUrl="
-				+ cdnImageUrl + ", cdnImageId=" + cdnImageId + ", price="
-				+ price + ", createdDate=" + createdDate + "]";
+		return "Item [id=" + id + ", endsiteUrl=" + endsiteUrl + ", job=" + job
+				+ ", name=" + name + ", brand=" + brand + ", endSite="
+				+ endSite + ", endsiteImageUrl=" + endsiteImageUrl
+				+ ", cdnImageUrl=" + cdnImageUrl + ", cdnImageId=" + cdnImageId
+				+ ", price=" + price + ", createdDate=" + createdDate + "]";
 	}
+
 
 
 

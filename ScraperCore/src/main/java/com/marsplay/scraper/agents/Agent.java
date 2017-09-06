@@ -19,15 +19,15 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.google.common.base.Function;
+import com.marsplay.repository.Job;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
-import com.marsplay.scraper.lib.FluentElementWait;
-import com.marsplay.scraper.lib.Util;
 import com.marsplay.scraper.lib.Constants.ElementType;
 import com.marsplay.scraper.lib.Constants.Endsites;
+import com.marsplay.scraper.lib.FluentElementWait;
+import com.marsplay.scraper.lib.Util;
 
 public abstract class Agent {
 	WebDriver driver = null;
@@ -43,9 +43,9 @@ public abstract class Agent {
 
 	public void searchAction(String query) throws InterruptedException {
 		WebElement searchTextbox = driver.findElement(By.xpath(businessProps
-				.getProperty("endsite.myntra.xpath.searchbox")));
+				.getProperty("myntra.xpath.searchbox")));
 		WebElement searchButton = driver.findElement(By.xpath(businessProps
-				.getProperty("endsite.myntra.xpath.searchbutton")));
+				.getProperty("myntra.xpath.searchbutton")));
 		searchTextbox.sendKeys(query);
 		searchButton.click();
 	}
@@ -55,11 +55,11 @@ public abstract class Agent {
 		FluentElementWait wait = new FluentElementWait(elem)
 				.withTimeout(
 						Long.parseLong(businessProps
-								.getProperty("endsite.common.element_load_timeout_seconds")),
+								.getProperty("common.element_load_timeout_seconds")),
 						TimeUnit.SECONDS)
 				.pollingEvery(
 						Long.parseLong(businessProps
-								.getProperty("endsite.common.element_load_sleep_timeout_millis")),
+								.getProperty("common.element_load_sleep_timeout_millis")),
 						TimeUnit.MILLISECONDS)
 				.ignoring(NoSuchElementException.class,
 						StaleElementReferenceException.class);
@@ -78,7 +78,7 @@ public abstract class Agent {
 		return myElement;
 	}
 
-	public abstract void scrapeAction() throws Exception;
+	public abstract void scrapeAction(Job job) throws Exception;
 
 	public String getPageScreenshot() throws IOException {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;

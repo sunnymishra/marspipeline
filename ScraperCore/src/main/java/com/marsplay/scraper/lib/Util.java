@@ -19,7 +19,7 @@ public class Util {
 		if(priceTemp==null || priceTemp.isEmpty())
 			throw new IllegalArgumentException("Price cannot be empty");
 		priceTemp=priceTemp.trim();
-		if(priceTemp.startsWith(props.getProperty("endsite.myntra.price.extratext"))){
+		if(priceTemp.startsWith(props.getProperty("myntra.price.extratext"))){
 			priceTemp=priceTemp.substring(3);
 			priceTemp=priceTemp.trim();
 		}

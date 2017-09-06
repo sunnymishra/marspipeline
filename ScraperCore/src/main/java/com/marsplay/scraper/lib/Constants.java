@@ -12,7 +12,6 @@ public class Constants {
 		populatePropertiesFile();
 	}
 	
-	
 	public enum Endsites{
 		MYNTRA
 	}

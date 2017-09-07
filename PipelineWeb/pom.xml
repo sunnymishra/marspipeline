@@ -19,18 +19,17 @@
 			<artifactId>PipelineRepository</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>PipelineScraper</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+		<!-- <dependency>
+			<groupId>com.marsplay</groupId>
+			<artifactId>ScraperCore</artifactId>
+			<version>1.0.0</version>
+		</dependency> -->
 
 		<!-- Below External dependencies -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-rest</artifactId>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>

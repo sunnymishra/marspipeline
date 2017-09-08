@@ -18,10 +18,13 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.google.common.base.Function;
 import com.marsplay.repository.Job;
+import com.marsplay.scraper.ScraperService;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
 import com.marsplay.scraper.lib.Constants.ElementType;
@@ -30,6 +33,8 @@ import com.marsplay.scraper.lib.FluentElementWait;
 import com.marsplay.scraper.lib.Util;
 
 public abstract class Agent {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(Agent.class);
 	WebDriver driver = null;
 	protected Properties businessProps = null;
 	protected Properties applicationProps = null;
@@ -46,8 +51,16 @@ public abstract class Agent {
 				.getProperty("myntra.xpath.searchbox")));
 		WebElement searchButton = driver.findElement(By.xpath(businessProps
 				.getProperty("myntra.xpath.searchbutton")));
+		long start=System.currentTimeMillis();
 		searchTextbox.sendKeys(query);
+		long duration=System.currentTimeMillis()-start;
+		LOGGER.info("Search typing duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
+		
+		start=System.currentTimeMillis();
 		searchButton.click();
+		duration=System.currentTimeMillis()-start;
+		LOGGER.info("Search buttonclick duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
+		
 	}
 
 	public WebElement waitAndExtractElement(WebElement elem,

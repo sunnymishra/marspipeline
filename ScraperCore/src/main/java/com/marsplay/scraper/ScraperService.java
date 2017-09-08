@@ -47,7 +47,7 @@ public class ScraperService implements CommandLineRunner {
 	
 	@Override
 	public void run(String... arg0) throws Exception {
-		System.out.println("#######Inside ScraperService method now ########");
+		LOGGER.info("#######Inside ScraperService method now ########");
 		businessProps = Constants.getBusinessProps();
 		applicationProps = Constants.getApplicationProps();
 		initChrome();
@@ -55,6 +55,7 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	private void initChrome() throws IOException {
+		LOGGER.info("#######Initializing Chrome ########");
 		String cloudinaryUrl = applicationProps
 				.getProperty("cloudinary.connection.url");
 		if (cloudinaryUrl != null && cloudinaryUrl != "")
@@ -75,6 +76,7 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	private void launchEndsite() throws InterruptedException {
+		LOGGER.info("#######Launching Endsite Myntra ########");
 		driver = new RemoteWebDriver(seleniumService.getUrl(),
 				DesiredCapabilities.chrome());
 
@@ -96,19 +98,31 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	public void startScraping(Job job) throws IOException, InterruptedException {
+		long localStart=System.currentTimeMillis();
 		extractor.searchAction(job.getMessage());
+		long localDuration=System.currentTimeMillis()-localStart;
+		LOGGER.info("Search duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
 		// TODO: Add Filter pattern here for Sorting and Add Myntra site Filters
 		Thread.sleep(200);
 		try {
+			localStart=System.currentTimeMillis();
 			job.setStatus(JobStatus.INPROGRESS.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
+			localDuration=System.currentTimeMillis()-localStart;
+			LOGGER.info("MongoDB Job update1 duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
 			
+			localStart=System.currentTimeMillis();
 			extractor.scrapeAction(job);
+			localDuration=System.currentTimeMillis()-localStart;
+			LOGGER.info("Only Scraping duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
 			
+			localStart=System.currentTimeMillis();
 			job.setStatus(JobStatus.FINISHED.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
+			localDuration=System.currentTimeMillis()-localStart;
+			LOGGER.info("MongoDB Job update2 duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

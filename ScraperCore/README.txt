@@ -12,3 +12,15 @@ Producer talks to Kafka server
 Consumer talks to Zookeper server
 
 Links: https://dzone.com/articles/running-apache-kafka-on-windows-os
+
+Include spring power shell as Dependency and Metric
+hit this on the console and you can dive into Boot application dashboard
+> dashboard
+
+Use Actuator to change Log level and get logs at runtime
+
+DevTools dependency in conjunction with Chrome Socket plugin auto-refreshes the Browser page for any java or Static content changes in code. 
+Doesn't work if any new dependency gets changed though.
+
+
+http://localhost:3000/job/search/findById?jobId=59be4e131083193ebcdfa761

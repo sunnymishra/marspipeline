@@ -28,11 +28,11 @@ public class JobRestController {
 	@Value("${kafka.topic.scrape}")
 	private String topic;
 
-	@RequestMapping(method = RequestMethod.GET)
+	/*@RequestMapping(method = RequestMethod.GET)
 	public ResponseEntity<?> getTest() {
 		System.out.println("Calling getTest API");
 		return ResponseEntity.noContent().build();
-	}
+	}*/
 
 	@RequestMapping(method = RequestMethod.POST)
 	// public ResponseEntity<?> add(@PathVariable String accountId,

@@ -1,7 +1,8 @@
 package com.marsplay.scraper;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -44,7 +46,10 @@ public class ScraperService implements CommandLineRunner {
 	private ItemRepository itemRepository;
 	@Autowired
 	private JobRepository jobRepository;
-	
+
+	@Value("${selenium.server.url}")
+	private String seleniumServerUrl;
+
 	@Override
 	public void run(String... arg0) throws Exception {
 		LOGGER.info("#######Inside ScraperService method now ########");
@@ -58,6 +63,8 @@ public class ScraperService implements CommandLineRunner {
 		LOGGER.info("#######Initializing Chrome ########");
 		String cloudinaryUrl = applicationProps
 				.getProperty("cloudinary.connection.url");
+		// TODO: Cludinary URL value should come from System variables set in
+		// startupscript
 		if (cloudinaryUrl != null && cloudinaryUrl != "")
 			CloudinarySingleton
 					.registerCloudinary(new Cloudinary(cloudinaryUrl));
@@ -65,20 +72,22 @@ public class ScraperService implements CommandLineRunner {
 		// then CoudinarySingleton will expect and fetch it from JVM args
 
 		// TODO: Use DriverManager class here
-		// TODO: This value should come from System variables set in startup
-		// script
-		String chromeDriver = applicationProps
-				.getProperty("chrome.driver.path");
-		seleniumService = new ChromeDriverService.Builder()
-				.usingDriverExecutable(new File(chromeDriver))
-				.usingAnyFreePort().build();
-		seleniumService.start();
+
+		/*
+		 * String chromeDriver = applicationProps
+		 * .getProperty("chrome.driver.path"); seleniumService = new
+		 * ChromeDriverService.Builder() .usingDriverExecutable(new
+		 * File(chromeDriver)) .usingAnyFreePort().build();
+		 * seleniumService.start();
+		 */
 	}
 
-	private void launchEndsite() throws InterruptedException {
+	private void launchEndsite() throws InterruptedException,
+			MalformedURLException {
 		LOGGER.info("#######Launching Endsite Myntra ########");
-		driver = new RemoteWebDriver(seleniumService.getUrl(),
-				DesiredCapabilities.chrome());
+		URL serverUrl = new URL(seleniumServerUrl);
+		// URL serverUrl = seleniumService.getUrl(),
+		driver = new RemoteWebDriver(serverUrl, DesiredCapabilities.chrome());
 
 		Timeouts timeouts = driver.manage().timeouts();
 		timeouts.pageLoadTimeout(Long.parseLong(businessProps
@@ -98,31 +107,38 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	public void startScraping(Job job) throws IOException, InterruptedException {
-		long localStart=System.currentTimeMillis();
+		long localStart = System.currentTimeMillis();
 		extractor.searchAction(job.getMessage());
-		long localDuration=System.currentTimeMillis()-localStart;
-		LOGGER.info("Search duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
+		long localDuration = System.currentTimeMillis() - localStart;
+		LOGGER.info("Search duration:" + ((int) (localDuration / 1000) % 60)
+				+ "s " + ((int) (localDuration % 1000)) + "m");
 		// TODO: Add Filter pattern here for Sorting and Add Myntra site Filters
 		Thread.sleep(200);
 		try {
-			localStart=System.currentTimeMillis();
+			localStart = System.currentTimeMillis();
 			job.setStatus(JobStatus.INPROGRESS.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			localDuration=System.currentTimeMillis()-localStart;
-			LOGGER.info("MongoDB Job update1 duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
-			
-			localStart=System.currentTimeMillis();
+			localDuration = System.currentTimeMillis() - localStart;
+			LOGGER.info("MongoDB Job update1 duration:"
+					+ ((int) (localDuration / 1000) % 60) + "s "
+					+ ((int) (localDuration % 1000)) + "m");
+
+			localStart = System.currentTimeMillis();
 			extractor.scrapeAction(job);
-			localDuration=System.currentTimeMillis()-localStart;
-			LOGGER.info("Only Scraping duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
-			
-			localStart=System.currentTimeMillis();
+			localDuration = System.currentTimeMillis() - localStart;
+			LOGGER.info("Only Scraping duration:"
+					+ ((int) (localDuration / 1000) % 60) + "s "
+					+ ((int) (localDuration % 1000)) + "m");
+
+			localStart = System.currentTimeMillis();
 			job.setStatus(JobStatus.FINISHED.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			localDuration=System.currentTimeMillis()-localStart;
-			LOGGER.info("MongoDB Job update2 duration:"+ ((int) (localDuration / 1000) % 60)+"s "+((int) (localDuration%1000))+"m");
+			localDuration = System.currentTimeMillis() - localStart;
+			LOGGER.info("MongoDB Job update2 duration:"
+					+ ((int) (localDuration / 1000) % 60) + "s "
+					+ ((int) (localDuration % 1000)) + "m");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -133,8 +149,8 @@ public class ScraperService implements CommandLineRunner {
 
 	@PreDestroy
 	public void cleanUp() throws Exception {
-		LOGGER.info("Killing Selenium driver instances and SeleniymService, before Spring destroys ScraperService Bean");
+		LOGGER.info("Killing Selenium driver instances and SeleniumService, before Spring destroys ScraperService Bean");
 		driver.quit();
-		seleniumService.stop();
+		// seleniumService.stop();
 	}
 }

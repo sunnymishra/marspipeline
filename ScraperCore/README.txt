@@ -22,5 +22,9 @@ Use Actuator to change Log level and get logs at runtime
 DevTools dependency in conjunction with Chrome Socket plugin auto-refreshes the Browser page for any java or Static content changes in code. 
 Doesn't work if any new dependency gets changed though.
 
+Windows Selenium server startup command -> > java -Dwebdriver.chrome.driver=./chromedriver.exe -jar selenium-server-standalone.jar -port 4444
+Ubuntu  Selenium server startup command -> $ xvfb-run java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
 
+API:
+----
 http://localhost:3000/job/search/findById?jobId=59be4e131083193ebcdfa761

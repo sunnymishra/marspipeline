@@ -1,0 +1,143 @@
+DNS: ec2-54-198-81-152.compute-1.amazonaws.com
+IP:  54.198.81.152
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install git
+sudo apt-get install openjdk-8-jdk
+/usr/share/maven/bin/mvn to provide /usr/bin/mvn 
+$ sudo apt-get install chromium-chromedriver
+$ sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
+export PATH=$PATH:/usr/lib/chromium-browser/
+apt-get install zookeeperd
+
+Install CHROME Browser + ChromeDriver + SeleniumStandalone
+----------------------------------------------------------
+
+
+
+
+DELETE CHROME:
+--------------
+$ sudo apt-get purge chromium-browser
+$ rm ~/.config/chromium/ -rf
+To uninstall Google Chrome, run these commands from your terminal:
+
+$ sudo apt-get purge google-chrome-stable
+$ rm ~/.config/google-chrome/ -rf
+
+DOWNLOAD CHROME:
+---------------
+Steps From Link  https://gist.github.com/ziadoz/3e8ab7e944d02fe872c3454d17af31a5
+sudo apt-get install xvfb
+sudo wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+sudo dpkg -i google-chrome-stable_current_amd64.deb
+sudo apt-get -f install
+google-chrome http://www.google.com
+ubuntu chrome: 61.0.3163.91
+
+DOWNLOAD CHROMDRIVER:
+---------------------
+wget -N http://chromedriver.storage.googleapis.com/2.31/chromedriver_linux64.zip -P ~/
+unzip ~/chromedriver_linux64.zip -d ./
+rm ~/chromedriver_linux64.zip
+sudo mv -f ./chromedriver /usr/local/bin/chromedriver
+sudo chown root:root /usr/local/bin/chromedriver
+sudo chmod 0755 /usr/local/bin/chromedriver
+cd /usr/bin
+sudo ln -s /usr/local/bin/chromedriver
+
+DOWNLOAD SELENIUM:
+---------------------
+wget -N https://selenium-release.storage.googleapis.com/3.4/selenium-server-standalone-3.4.0.jar -P .
+sudo mv -f ./selenium-server-standalone-3.4.0.jar /usr/local/bin/selenium-server-standalone.jar
+sudo chown root:root /usr/local/bin/selenium-server-standalone.jar
+sudo chmod 0755 /usr/local/bin/selenium-server-standalone.jar
+
+Launch Chrome:
+--------------
+With Xvfb: 				$ xvfb-run java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+With Headless Chrome: 	$ chromedriver --url-base=/wd/hub
+Windows command -> java -Dwebdriver.chrome.driver=./chromedriver.exe -jar selenium-server-standalone.jar -port 4444
+http://localhost:4444/wd/hub
+
+sudo vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
+cd /opt/project/Pipeline/ScraperCore/
+sudo mvn clean install
+sudo java -jar  /opt/project/Pipeline/ScraperCore/target/ScraperCore-1.0.0-exec.jar
+
+
+GIT:
+----
+https://stackoverflow.com/questions/22620393/various-ways-to-remove-local-git-changes
+Tracked=Indexed || Staged=Commited || UnTracked=New and unindexed || UnStaged=Uncommitted
+
+git checkout . 		- Removes Unstaged Tracked files ONLY [Type 2]  -n = Preview damage done
+git clean -f 		- Removes Unstaged UnTracked files ONLY [Type 3]
+git reset --hard 	- Removes Staged Tracked and UnStaged Tracked files ONLY[Type 1, Type 2]
+git stash -u 		- Removes all changes [Type 1, Type 2, Type 3]
+
+
+JAVA:
+------
+Jdk : 1.8.0_131
+mkdir conf/java.env
+echo "JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64" > conf/java.env
+whereis java
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+ls -l <softlink>
+
+MONGODB:
+--------
+spring.data.mongodb.uri=mongodb://admin:admin1234@ds135534.mlab.com:35534/marsplay_pipeline
+
+ZOOKEEPER:
+----------
+/etc/zookeeper/
+/opt/zookeeper
+/usr/share/zookeeper/bin/zkServer
+zookeeper 2181
+telnet localhost 2181
+ruok
+ps -ef | grep zookeeper
+whereis zookeeper
+zookeeper.log.dir=/var/log/zookeeper
+Ubuntu Service status-> sudo service --status-all
+START Service-> sudo service zookeeper status/start/stop
+
+KAFKA:
+------
+Download folder-> /downloads
+Install folder-> /etc/kafka/kafka_2.12-0.11.0.0
+PORT-> kafka 9092
+Kafka download & Install steps:
+-------------------------------
+1) wget "http://mirror.cc.columbia.edu/pub/software/apache/kafka/0.10.0.1/kafka_2.10-0.10.0.1.tgz" -O /downloads/kafka.tgz
+wget "http://mirror.cc.columbia.edu/pub/software/apache/kafka/0.11.0.0/kafka_2.12-0.11.0.0.tgz" -O /downloads/kafka11.tgz
+2) sudo mkdir /etc/kafka/
+3) cd /etc/kafka/
+4) sudo tar -xvf kafka11.tgz -C /etc/kafka/
+server.properties below:
+5) log.dirs=/opt/kafka-logs
+kafka.logs.dir=/etc/kafka/kafka_2.12-0.11.0.0/bin/../logs
+6) Start Service-> sudo nohup /etc/kafka/kafka_2.12-0.11.0.0/bin/kafka-server-start.sh /etc/kafka/kafka_2.12-0.11.0.0/config/server.properties &
+
+
+SOURCE CODE:
+-------------
+https://sunnymishra@bitbucket.org/martianplayer/aggregation-pipeline.git
+/opt/marstomcat/logs
+/opt/project/Pipeline/PipelineWeb/target$ sudo java -jar PipelineWeb-1.0.0-exec.jar
+
+
+-------------------------------------------------------------------------------
+POST http://localhost:3000/job
+{
+  "message":"rayban sunglasses"
+}
+
+GET http://localhost:3000/item/search/findByJobId?jobId=59be4e131083193ebcdfa761
+GET http://localhost:3000/job/search/findById?jobId=59be4e131083193ebcdfa761
+
+
+

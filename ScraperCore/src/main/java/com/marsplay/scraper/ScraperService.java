@@ -57,6 +57,11 @@ public class ScraperService implements CommandLineRunner {
 		applicationProps = Constants.getApplicationProps();
 		initChrome();
 		launchEndsite();
+//		startScraping(new Job("rayban sunglasses", new Date()));
+//		startScraping(new Job("polka dots dress", new Date()));
+//		startScraping(new Job("polka dots shirt", new Date()));
+//		startScraping(new Job("polka dots tshirt", new Date()));
+//		startScraping(new Job("polka dots top", new Date()));
 	}
 
 	private void initChrome() throws IOException {
@@ -84,7 +89,7 @@ public class ScraperService implements CommandLineRunner {
 
 	private void launchEndsite() throws InterruptedException,
 			MalformedURLException {
-		LOGGER.info("#######Launching Endsite Myntra ########");
+		LOGGER.info("#######Launching Endsite Myntra. seleniumServerUrl={} ########", seleniumServerUrl);
 		URL serverUrl = new URL(seleniumServerUrl);
 		// URL serverUrl = seleniumService.getUrl(),
 		driver = new RemoteWebDriver(serverUrl, DesiredCapabilities.chrome());
@@ -93,22 +98,30 @@ public class ScraperService implements CommandLineRunner {
 		timeouts.pageLoadTimeout(Long.parseLong(businessProps
 				.getProperty("common.page_load_timeout_seconds")),
 				TimeUnit.SECONDS);
-		try {
+		/*try {
 			driver.get(businessProps.getProperty("myntra.url"));
+			LOGGER.info("#######Launched Endsite success####");
 		} catch (org.openqa.selenium.TimeoutException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		driver.manage().window().maximize();
+		}*/
+//		driver.manage().window().maximize();
 		extractor = new MyntraAgent(driver, itemRepository);
 		// TODO: See that we can avoid putting this constructor inside
 		// startScraping(),else multiple objects will be created needlessly
-		Thread.sleep(1000);
 	}
 
 	public void startScraping(Job job) throws IOException, InterruptedException {
 		long localStart = System.currentTimeMillis();
-		extractor.searchAction(job.getMessage());
+//		extractor.searchAction(job.getMessage());
+		try {
+			driver.get(businessProps.getProperty("myntra.url")+job.getMessage());
+			LOGGER.info("#######Launched Endsite success####");
+//			Thread.sleep(1000);
+		} catch (org.openqa.selenium.TimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		long localDuration = System.currentTimeMillis() - localStart;
 		LOGGER.info("Search duration:" + ((int) (localDuration / 1000) % 60)
 				+ "s " + ((int) (localDuration % 1000)) + "m");
@@ -125,7 +138,7 @@ public class ScraperService implements CommandLineRunner {
 					+ ((int) (localDuration % 1000)) + "m");
 
 			localStart = System.currentTimeMillis();
-			extractor.scrapeAction(job);
+			extractor.scrapeAction(job);	// This code will scrape the EndSite
 			localDuration = System.currentTimeMillis() - localStart;
 			LOGGER.info("Only Scraping duration:"
 					+ ((int) (localDuration / 1000) % 60) + "s "

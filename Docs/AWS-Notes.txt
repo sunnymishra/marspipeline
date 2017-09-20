@@ -54,17 +54,19 @@ sudo mv -f ./selenium-server-standalone-3.4.0.jar /usr/local/bin/selenium-server
 sudo chown root:root /usr/local/bin/selenium-server-standalone.jar
 sudo chmod 0755 /usr/local/bin/selenium-server-standalone.jar
 
-Launch Chrome:
---------------
-With Xvfb: 				$ xvfb-run java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+Launch SeleniumStandaloneChrome:
+--------------------------------
+With Xvfb: 				
+Note: Don't use sudo ->xvfb-run -a java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+
 With Headless Chrome: 	$ chromedriver --url-base=/wd/hub
 Windows command -> java -Dwebdriver.chrome.driver=./chromedriver.exe -jar selenium-server-standalone.jar -port 4444
 http://localhost:4444/wd/hub
 
-sudo vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
-cd /opt/project/Pipeline/ScraperCore/
-sudo mvn clean install
-sudo java -jar  /opt/project/Pipeline/ScraperCore/target/ScraperCore-1.0.0-exec.jar
+Command to find process listening on a port:
+sudo netstat -nlp | grep 9515
+ps -ef | grep chrome
+sudo kill -9 <PID>
 
 
 GIT:
@@ -77,7 +79,6 @@ git clean -f 		- Removes Unstaged UnTracked files ONLY [Type 3]
 git reset --hard 	- Removes Staged Tracked and UnStaged Tracked files ONLY[Type 1, Type 2]
 git stash -u 		- Removes all changes [Type 1, Type 2, Type 3]
 
-
 JAVA:
 ------
 Jdk : 1.8.0_131
@@ -89,21 +90,41 @@ ls -l <softlink>
 
 MONGODB:
 --------
-spring.data.mongodb.uri=mongodb://admin:admin1234@ds135534.mlab.com:35534/marsplay_pipeline
+
 
 ZOOKEEPER:
 ----------
-/etc/zookeeper/
-/opt/zookeeper
-/usr/share/zookeeper/bin/zkServer
-zookeeper 2181
-telnet localhost 2181
-ruok
+1) To delete configuration and data files and all sub-dependencies of zookeeper:
+	$ sudo apt-get purge --auto-remove zookeeper
+2) Download and install zookeeper:
+	$ sudo wget http://mirrors.advancedhosters.com/apache/zookeeper/zookeeper-3.4.10/zookeeper-3.4.10.tar.gz
+	$ tar xzvf zookeeper-3.4.10.tar.gz
+	cd /etc
+	sudo mkdir zookeeper
+	cd zookeeper
+	sudo mv /downloads/zookeeper-3.4.10 ./
+	sudo mv ./zookeeper-3.4.10/conf/zoo_sample.cfg ./zookeeper-3.4.10/conf/zoo.cfg
+3) Start / Stop:
+	sudo /etc/zookeeper/zookeeper-3.4.10/bin/zkServer.sh stop
+	sudo /etc/zookeeper/zookeeper-3.4.10/bin/zkServer.sh start
+	Server console log: 	/etc/zookeeper.out
+	Server index log files: /opt/zookeeper
+4) Test if server is up:
+	$ zookeeper telnet status->     echo ruok | nc 127.0.0.1  2181
+	$ zookeeper version installed-> echo status | nc localhost 2181
+
+	Port: 2181
+	Version: 3.4.10
+
 ps -ef | grep zookeeper
 whereis zookeeper
+
+Optional zookeeperd (zookeeper-server) installation:
+-----------------------------------------------------------
+Installation folder -> /etc/zookeeper/ , /usr/share/zookeeper/bin/zkServer , /opt/zookeeper
 zookeeper.log.dir=/var/log/zookeeper
-Ubuntu Service status-> sudo service --status-all
 START Service-> sudo service zookeeper status/start/stop
+-----------------------------------------------------------
 
 KAFKA:
 ------
@@ -122,14 +143,27 @@ server.properties below:
 kafka.logs.dir=/etc/kafka/kafka_2.12-0.11.0.0/bin/../logs
 6) Start Service-> sudo nohup /etc/kafka/kafka_2.12-0.11.0.0/bin/kafka-server-start.sh /etc/kafka/kafka_2.12-0.11.0.0/config/server.properties &
 
-
+UBUNTU Generic:
+---------------
+Ubuntu Service status-> sudo service --status-all
+How to avoid putty ssh inactivity default time: https://stackoverflow.com/questions/7210011/amazon-ec2-ssh-timeout-due-inactivity
+Command to find process listening on a port:   sudo netstat -nlp | grep 9515
+To create temp SuperUser pwd-> sudo passwd root
+To switch to superUser-> sudo su
+> sunny123
+To view hidden folders-> ls -ltra 
 SOURCE CODE:
 -------------
 https://sunnymishra@bitbucket.org/martianplayer/aggregation-pipeline.git
-/opt/marstomcat/logs
+
 /opt/project/Pipeline/PipelineWeb/target$ sudo java -jar PipelineWeb-1.0.0-exec.jar
+/opt/project/Pipeline/ScraperCore/target$ sudo java -jar ScraperCore-1.0.0-exec.jar
 
-
+sudo vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
+sudo vi /opt/project/Pipeline/ScraperCore/src/main/resources/application.properties
+cd /opt/project/Pipeline/ScraperCore/
+sudo mvn clean install
+sudo nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &
 -------------------------------------------------------------------------------
 POST http://localhost:3000/job
 {
@@ -138,6 +172,6 @@ POST http://localhost:3000/job
 
 GET http://localhost:3000/item/search/findByJobId?jobId=59be4e131083193ebcdfa761
 GET http://localhost:3000/job/search/findById?jobId=59be4e131083193ebcdfa761
-
+curl -H "Content-Type: application/json" -X POST -d '{"message":"sunglasses"}' http://localhost:3000/job
 
 

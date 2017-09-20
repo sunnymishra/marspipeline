@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,7 +43,14 @@ public class JobRestController {
 				.println("Inside POST ##########################################");
 		URI location = null;
 		// try {
+		
+		String msg=input.getMessage();
+		if(StringUtils.isEmpty(msg))
+			return ResponseEntity.badRequest().build();
+		// NOTE: we only permit alphanumeric characters and white space i.e [aA-zZ, 0-9]
+		input.setMessage(msg.replaceAll("[^\\w\\s]",""));
 		input.setStatus(JobStatus.SUBMITTED.name());
+		
 		Job result = jobRepository.save(input);
 
 		sender.send(topic, result);

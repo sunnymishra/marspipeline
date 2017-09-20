@@ -37,6 +37,7 @@ public class MyntraAgent extends Agent {
 	@Override
 	public void scrapeAction(Job job) throws Exception {
 		LOGGER.info("Scraping Myntra for Job '{}'", job);
+		//Thread.sleep(1000);
 		WebElement container = driver.findElement(By.xpath(businessProps
 				.getProperty("myntra.xpath.container")));
 		List<WebElement> itemContainer = driver.findElements(By
@@ -135,7 +136,7 @@ public class MyntraAgent extends Agent {
 				duration=System.currentTimeMillis()-start;
 				LOGGER.info("MongoDB save duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
 			} catch (Exception e) {
-				e.printStackTrace();
+//				e.printStackTrace();
 				Throwable rootException = ExceptionUtils.getRootCause(e);
 				if (rootException instanceof DuplicateKeyException) {
 					// Eat exception here else throw exception

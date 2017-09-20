@@ -100,12 +100,13 @@ public class ScraperService implements CommandLineRunner {
 				TimeUnit.SECONDS);
 		/*try {
 			driver.get(businessProps.getProperty("myntra.url"));
+			driver.manage().window().maximize();
 			LOGGER.info("#######Launched Endsite success####");
 		} catch (org.openqa.selenium.TimeoutException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}*/
-//		driver.manage().window().maximize();
+		
 		extractor = new MyntraAgent(driver, itemRepository);
 		// TODO: See that we can avoid putting this constructor inside
 		// startScraping(),else multiple objects will be created needlessly
@@ -116,6 +117,7 @@ public class ScraperService implements CommandLineRunner {
 //		extractor.searchAction(job.getMessage());
 		try {
 			driver.get(businessProps.getProperty("myntra.url")+job.getMessage());
+			driver.manage().window().maximize();
 			LOGGER.info("#######Launched Endsite success####");
 //			Thread.sleep(1000);
 		} catch (org.openqa.selenium.TimeoutException e) {

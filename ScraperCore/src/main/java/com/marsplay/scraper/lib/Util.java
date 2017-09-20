@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Properties;
 
 public class Util {
-	private static Properties props = Constants.getBusinessProps();
+	private static Properties businessProps = Constants.getBusinessProps();
 	/**
 	 * Myntra Scraped Price eg. "Rs. 500". This Util method
 	 * trims the String and strips Alphabets 'Rs.' and then
@@ -19,7 +19,7 @@ public class Util {
 		if(priceTemp==null || priceTemp.isEmpty())
 			throw new IllegalArgumentException("Price cannot be empty");
 		priceTemp=priceTemp.trim();
-		if(priceTemp.startsWith(props.getProperty("myntra.price.extratext"))){
+		if(priceTemp.startsWith(businessProps.getProperty("myntra.price.extratext"))){
 			priceTemp=priceTemp.substring(3);
 			priceTemp=priceTemp.trim();
 		}
@@ -60,7 +60,7 @@ public class Util {
 	public static String getTime(){
 		
 		Date date = new Date();
-		SimpleDateFormat dformat = new SimpleDateFormat(props.getProperty("date.format"));
+		SimpleDateFormat dformat = new SimpleDateFormat(businessProps.getProperty("date.format"));
 		String dte = dformat.format(date);
 		return dte;
 	 }

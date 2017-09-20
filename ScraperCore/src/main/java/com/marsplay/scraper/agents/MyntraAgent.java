@@ -44,6 +44,9 @@ public class MyntraAgent extends Agent {
 				.xpath(businessProps.getProperty("myntra.xpath.item")));
 		int counter = 0;
 		int scrollHeight = -1, scrollItemCount = -1;
+		
+		getPageScreenshot(job.getId());	// Taking Page screenshot
+		
 		for (WebElement item : itemContainer) {
 			int retry = 0;
 			// ItemVO itemVO = new ItemVO(Endsites.MYNTRA);
@@ -51,6 +54,7 @@ public class MyntraAgent extends Agent {
 			itemVO.setJob(job);
 			itemVO.setEndSite(Endsites.MYNTRA.name());
 			++counter;
+			getElementScreenshot(item, "item"+counter, job.getId());
 			// item.sendKeys( Keys.DOWN ); //simulate visual movement
 			boolean isElementLoaded = false;
 			while (!isElementLoaded) {
@@ -61,20 +65,24 @@ public class MyntraAgent extends Agent {
 					WebElement brand = item.findElement(By.xpath(businessProps
 							.getProperty("myntra.relative.xpath.brand")));
 					itemVO.setBrand(brand.getText());
+					getElementScreenshot(item, "brand"+counter, job.getId());
 					// WebElement element =
 					// webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("periodicElement")));
 					WebElement name = item.findElement(By.xpath(businessProps
 							.getProperty("myntra.relative.xpath.name")));
 					itemVO.setName(name.getText());
+					getElementScreenshot(item, "name"+counter, job.getId());
 					LOGGER.info(itemVO.toString());
 
 					WebElement price = null;
 					try {
 						price = item.findElement(By.xpath(businessProps
 								.getProperty("myntra.relative.xpath.price1")));
+						getElementScreenshot(item, "priceA"+counter, job.getId());
 					} catch (org.openqa.selenium.NoSuchElementException e) {
 						price = item.findElement(By.xpath(businessProps
 								.getProperty("myntra.relative.xpath.price2")));
+						getElementScreenshot(item, "priceB"+counter, job.getId());
 					}
 					try {
 						itemVO.setPrice(Util.formatMyntraPrice(price.getText()));

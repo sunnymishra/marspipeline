@@ -93,32 +93,36 @@ public abstract class Agent {
 
 	public abstract void scrapeAction(Job job) throws Exception;
 
-	public String getPageScreenshot() throws IOException {
+	public String getPageScreenshot(String jobId) throws IOException {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screen = imgcapture.getScreenshotAs(OutputType.FILE);
-		String fpath = "D:\\MyProject\\reports_Page_" + Util.getTime()
-				+ ".html";
+		String screenshotBasePath=applicationProps.getProperty("scraper.screenshot.path");
+		String fpath = screenshotBasePath + File.separator + "page.jobId." + jobId + "."+ Util.getTime()
+				+ ".png";
 		FileUtils.copyFile(screen, new File(fpath));
 		return fpath;
 	}
 
-	public String getElementScreenshot(WebElement ele) throws Exception {
+	public String getElementScreenshot(WebElement elem, String elemName, String jobId) throws Exception {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screenshot = imgcapture.getScreenshotAs(OutputType.FILE);
 		BufferedImage fullImg = ImageIO.read(screenshot);
 
 		// Get the location of element on the page
-		Point point = ele.getLocation();
+		Point point = elem.getLocation();
 
 		// Get width and height of the element
-		int eleWidth = ele.getSize().getWidth();
-		int eleHeight = ele.getSize().getHeight();
+		int eleWidth = elem.getSize().getWidth();
+		int eleHeight = elem.getSize().getHeight();
 
 		// Crop the entire page screenshot to get only element screenshot
 		BufferedImage eleScreenshot = fullImg.getSubimage(point.getX(),
 				point.getY(), eleWidth, eleHeight);
 		ImageIO.write(eleScreenshot, "png", screenshot);
-		String path = "D:\\MyProject\\reports_Elem_" + Util.getTime() + ".html";
+		
+		String screenshotBasePath=applicationProps.getProperty("scraper.screenshot.path");
+		String path = screenshotBasePath + File.separator + "elem." + elemName + "." + "jobId."+ jobId + "."+ Util.getTime()
+				+ ".png";
 		// Copy the element screenshot to disk
 		FileUtils.copyFile(screenshot, new File(path));
 		return path;

@@ -5,6 +5,9 @@ target/
 .classpath
 .project
 .settings/
+*.png
+*.pem
+*.ppk
 
 # Ignore any file with extension '.log'
 *.log

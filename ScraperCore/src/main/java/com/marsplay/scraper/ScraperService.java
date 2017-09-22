@@ -117,7 +117,7 @@ public class ScraperService implements CommandLineRunner {
 //		extractor.searchAction(job.getMessage());
 		try {
 			driver.get(businessProps.getProperty("myntra.url")+job.getMessage());
-			driver.manage().window().maximize();
+//			driver.manage().window().maximize();
 			LOGGER.info("#######Launched Endsite success####");
 //			Thread.sleep(1000);
 		} catch (org.openqa.selenium.TimeoutException e) {
@@ -159,7 +159,7 @@ public class ScraperService implements CommandLineRunner {
 			e.printStackTrace();
 		}
 
-		LOGGER.info("Existing startScraping() method.");
+		LOGGER.info("Exiting startScraping() method.");
 	}
 
 	@PreDestroy

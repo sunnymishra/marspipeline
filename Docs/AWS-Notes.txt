@@ -124,8 +124,9 @@ MONGODB:
 
 Launch SeleniumStandaloneChrome:
 --------------------------------
-With Xvfb: 				
-Note: Don't use sudo ->xvfb-run -a java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+With Xvfb, Don't use sudo -> 
+xvfb-run -s "-screen 0, 1920x1520x24" -a java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+
 
 With Headless Chrome: 	$ chromedriver --url-base=/wd/hub
 Windows command -> java -Dwebdriver.chrome.driver=./chromedriver.exe -jar selenium-server-standalone.jar -port 4444

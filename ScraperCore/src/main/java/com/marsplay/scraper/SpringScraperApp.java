@@ -14,10 +14,10 @@ public class SpringScraperApp{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringScraperApp.class);
 
 	public static void main(String[] args) throws Exception {
-		LOGGER.info("Spring boot starting....");
+		LOGGER.info("######Spring boot starting....");
 		ConfigurableApplicationContext context = SpringApplication.run(
 				SpringScraperApp.class, args);
-		LOGGER.info("Scraper Spring boot started='{}'", "Successfully");
+		LOGGER.info("######Scraper Spring boot started='{}'", "Successfully");
 	}
 
 }

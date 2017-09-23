@@ -30,6 +30,7 @@ import com.marsplay.scraper.agents.Agent;
 import com.marsplay.scraper.agents.MyntraAgent;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
+import com.marsplay.scraper.lib.Util;
 
 @Component
 public class ScraperService implements CommandLineRunner {
@@ -52,7 +53,7 @@ public class ScraperService implements CommandLineRunner {
 
 	@Override
 	public void run(String... arg0) throws Exception {
-		LOGGER.info("#######Inside ScraperService method now ########");
+		LOGGER.info("#######ENTER ScraperService.run().");
 		businessProps = Constants.getBusinessProps();
 		applicationProps = Constants.getApplicationProps();
 		initChrome();
@@ -65,7 +66,7 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	private void initChrome() throws IOException {
-		LOGGER.info("#######Initializing Chrome ########");
+		LOGGER.info("#######Initializing Chrome...");
 		String cloudinaryUrl = applicationProps
 				.getProperty("cloudinary.connection.url");
 		// TODO: Cludinary URL value should come from System variables set in
@@ -89,7 +90,7 @@ public class ScraperService implements CommandLineRunner {
 
 	private void launchEndsite() throws InterruptedException,
 			MalformedURLException {
-		LOGGER.info("#######Launching Endsite Myntra. seleniumServerUrl={} ########", seleniumServerUrl);
+		LOGGER.info("#######Launching Endsite Myntra.");
 		URL serverUrl = new URL(seleniumServerUrl);
 		// URL serverUrl = seleniumService.getUrl(),
 		driver = new RemoteWebDriver(serverUrl, DesiredCapabilities.chrome());
@@ -118,15 +119,13 @@ public class ScraperService implements CommandLineRunner {
 		try {
 			driver.get(businessProps.getProperty("myntra.url")+job.getMessage());
 //			driver.manage().window().maximize();
-			LOGGER.info("#######Launched Endsite success####");
+			LOGGER.info("#######Launched Endsite successfully");
 //			Thread.sleep(1000);
 		} catch (org.openqa.selenium.TimeoutException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOGGER.error("Could not open Myntra endsite", e);
 		}
-		long localDuration = System.currentTimeMillis() - localStart;
-		LOGGER.info("Search duration:" + ((int) (localDuration / 1000) % 60)
-				+ "s " + ((int) (localDuration % 1000)) + "m");
+		LOGGER.info(Util.logTime(localStart, "ENDITE_MYNTRA_OPEN"));
 		// TODO: Add Filter pattern here for Sorting and Add Myntra site Filters
 		Thread.sleep(200);
 		try {
@@ -134,32 +133,23 @@ public class ScraperService implements CommandLineRunner {
 			job.setStatus(JobStatus.INPROGRESS.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			localDuration = System.currentTimeMillis() - localStart;
-			LOGGER.info("MongoDB Job update1 duration:"
-					+ ((int) (localDuration / 1000) % 60) + "s "
-					+ ((int) (localDuration % 1000)) + "m");
+			LOGGER.info(Util.logTime(localStart, "MONGO_UPDATE_JOB"));
 
 			localStart = System.currentTimeMillis();
 			extractor.scrapeAction(job);	// This code will scrape the EndSite
-			localDuration = System.currentTimeMillis() - localStart;
-			LOGGER.info("Only Scraping duration:"
-					+ ((int) (localDuration / 1000) % 60) + "s "
-					+ ((int) (localDuration % 1000)) + "m");
+			LOGGER.info(Util.logTime(localStart, "SCRAPE_WORK"));
 
 			localStart = System.currentTimeMillis();
 			job.setStatus(JobStatus.FINISHED.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			localDuration = System.currentTimeMillis() - localStart;
-			LOGGER.info("MongoDB Job update2 duration:"
-					+ ((int) (localDuration / 1000) % 60) + "s "
-					+ ((int) (localDuration % 1000)) + "m");
+			LOGGER.info(Util.logTime(localStart, "MONGO_UPDATE_SUCCESS_JOB"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		LOGGER.info("Exiting startScraping() method.");
+		LOGGER.info("EXIT ScraperService.startScraping().");
 	}
 
 	@PreDestroy

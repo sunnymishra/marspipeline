@@ -38,7 +38,9 @@ public class MyntraAgent extends Agent {
 	public void scrapeAction(Job job) throws Exception {
 		LOGGER.info("Scraping Myntra for Job '{}'", job);
 		//Thread.sleep(1000);
+		long start=System.currentTimeMillis();
 		getPageScreenshot(job.getId());	// Taking Page screenshot
+		LOGGER.info(Util.logTime(start, "PAGE_SCREENSHOT"));
 		
 		WebElement container = driver.findElement(By.xpath(businessProps
 				.getProperty("myntra.xpath.container")));
@@ -130,19 +132,17 @@ public class MyntraAgent extends Agent {
 
 			}
 			try {
-				long start=System.currentTimeMillis();
+				start=System.currentTimeMillis();
 				Map<String, Object> responseMap = uploadFile(itemVO
 						.getEndsiteImageUrl());
-				long duration=System.currentTimeMillis()-start;
-				LOGGER.info("Cloudinary upload duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
-				
+				LOGGER.info(Util.logTime(start, "CLOUDINARY_UPLOAD"));
+
 				itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
 				itemVO.setCdnImageId((String) responseMap.get("public_id"));
 				
 				start=System.currentTimeMillis();
 				itemRepository.save(itemVO);
-				duration=System.currentTimeMillis()-start;
-				LOGGER.info("MongoDB save duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
+				LOGGER.info(Util.logTime(start, "MONGO_SAVE_ITEM"));
 			} catch (Exception e) {
 //				e.printStackTrace();
 				Throwable rootException = ExceptionUtils.getRootCause(e);

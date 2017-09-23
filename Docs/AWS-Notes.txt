@@ -11,6 +11,9 @@ $ sudo ln -s /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver
 export PATH=$PATH:/usr/lib/chromium-browser/
 apt-get install zookeeperd
 
+NGINX:
+------
+https://mobisoftinfotech.com/resources/mguide/setting-nginx-reverse-proxy-ubuntu-16-04-server-aws-ec2/
 
 ZOOKEEPER:
 ----------
@@ -125,8 +128,9 @@ MONGODB:
 Launch SeleniumStandaloneChrome:
 --------------------------------
 With Xvfb, Don't use sudo -> 
-xvfb-run -s "-screen 0, 1920x1520x24" -a java -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+xvfb-run -s "-screen 0, 1920x1520x24" -a java -Dwebdriver.server.session.timeout=31540000 -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
 
+NOTE: The timeout is for 1 year period. After that Selenium Driver will shutdown and SpringScraper app will fail
 
 With Headless Chrome: 	$ chromedriver --url-base=/wd/hub
 Windows command -> java -Dwebdriver.chrome.driver=./chromedriver.exe -jar selenium-server-standalone.jar -port 4444
@@ -152,12 +156,13 @@ SOURCE CODE:
 -------------
 https://sunnymishra@bitbucket.org/martianplayer/aggregation-pipeline.git
 
-/opt/project/Pipeline/PipelineWeb/target$ sudo java -jar PipelineWeb-1.0.0-exec.jar
-/opt/project/Pipeline/ScraperCore/target$ sudo java -jar ScraperCore-1.0.0-exec.jar
+sudo vi /opt/project/Pipeline/PipelineWeb/src/main/resources/application.properties
+sudo nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &
 
 sudo vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
 sudo vi /opt/project/Pipeline/ScraperCore/src/main/resources/application.properties
-cd /opt/project/Pipeline/ScraperCore/
+sudo nohup java -jar /opt/project/Pipeline/ScraperCore/target/ScraperCore-1.0.0-exec.jar &
+
 sudo mvn clean install
 sudo nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &
 -------------------------------------------------------------------------------

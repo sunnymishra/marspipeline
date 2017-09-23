@@ -5,7 +5,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Util {
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(Util.class);
 	private static Properties businessProps = Constants.getBusinessProps();
 	/**
 	 * Myntra Scraped Price eg. "Rs. 500". This Util method
@@ -64,4 +69,9 @@ public class Util {
 		String dte = dformat.format(date);
 		return dte;
 	 }
+	public static String logTime(long startTime, String work) {
+		long localDuration = System.currentTimeMillis() - startTime;
+		return ">>>>>>>>Duration "+work+":" + ((int) (localDuration / 1000) % 60)
+				+ "s " + ((int) (localDuration % 1000)) + "m";
+	}
 }

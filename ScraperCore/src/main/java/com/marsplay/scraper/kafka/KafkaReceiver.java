@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.marsplay.repository.Job;
 import com.marsplay.scraper.ScraperService;
+import com.marsplay.scraper.lib.Util;
 
 @Component
 public class KafkaReceiver {
@@ -35,13 +36,10 @@ public class KafkaReceiver {
 			  @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) throws IOException, InterruptedException{
 //	public void doSomething(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload String payload) {
 		long start=System.currentTimeMillis();
-		LOGGER.info("#################################################################################"
-				+ "received payload='{}', partitionId='{}', key='{}'", job, partition);
-//		latch.countDown();
+		LOGGER.info("#####KafkaListener payload='{}', partitionId='{}'", job, partition);
 		scraper.startScraping(job);
-		LOGGER.info("##############################KafkaReceiver Completed 1 Job");
-		long duration=System.currentTimeMillis()-start;
-		LOGGER.info("Overall startScraping() duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
+		LOGGER.info("#####KafkaListener Completed jobId={}",job.getId());
+		LOGGER.info(Util.logTime(start, "SCRAPE_COMPLETE"));
 	}
 	
 }

@@ -11,6 +11,6 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface JobRepository extends MongoRepository<Job, String> {
 	Optional<Job> findById(@Param("jobId") String jobId);
     Collection<Job> findByCreatedDate(@Param("createdDate") String createdDate);
-    Collection<Job> findByMessage(@Param("message") String message);
+//    Collection<Job> findByMessage(String message);
 }
 

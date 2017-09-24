@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -27,12 +30,11 @@ import com.marsplay.web.lib.Util;
 public class JobRestController {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(JobRestController.class);
-	@Autowired
-	private JobRepository jobRepository;
-
-	@Autowired
-	private KafkaSender sender;
-
+	
+	@Autowired private JobRepository jobRepository;
+	@Autowired private KafkaSender sender;
+	@Autowired private MongoTemplate mongoTemplate;
+	
 	@Value("${kafka.topic.scrape}")
 	private String topic;
 
@@ -59,12 +61,16 @@ public class JobRestController {
 			// Below we are checking if a similar Message already exists in JOB collection
 			// If yes then return value from DB
 			long localStart = System.currentTimeMillis();
-			List<Job> dbJobs=(List<Job>)jobRepository.findByMessage(job.getMessage());
-			LOGGER.info(Util.logTime(localStart, "MONGO_FIND_JOB_BY_MESSAGE"));
+			Criteria c = new Criteria().andOperator(Criteria.where("message").is(job.getMessage()),  
+                    								Criteria.where("status").is("FINISHED"));
+			Job dbJob = mongoTemplate.findOne(Query.query(c), Job.class);
 			
-			if(!dbJobs.isEmpty()){
+//			List<Job> dbJobs=(List<Job>)jobRepository.findByMessage(job.getMessage());
+			LOGGER.info(Util.logTime(localStart, "MONGO_FIND_JOB_BY_MESSAGE-STATUS"));
+			
+			if(dbJob!=null){
 				Map<String, String> entity = new HashMap<String, String>();
-				entity.put("jobId", dbJobs.get(0).getId());
+				entity.put("jobId", dbJob.getId());
 				success=true;
 				return new ResponseEntity<Object>(entity, HttpStatus.OK);
 			}

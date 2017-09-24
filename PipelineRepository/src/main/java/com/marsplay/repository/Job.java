@@ -3,17 +3,21 @@ package com.marsplay.repository;
 import java.util.Date;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 @Document(collection="job")
+@CompoundIndexes({
+    @CompoundIndex(name = "message_status", def = "{'message' : 1, 'status': 1}")
+})
 public class Job {
 	@Id
 	private String id;
-	@Indexed
+//	@Indexed
 	private String message;
 	private String status;
 	

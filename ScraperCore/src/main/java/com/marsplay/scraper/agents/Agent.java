@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -32,21 +33,25 @@ import com.marsplay.scraper.lib.Constants.Endsites;
 import com.marsplay.scraper.lib.FluentElementWait;
 import com.marsplay.scraper.lib.Util;
 
-public abstract class Agent {
+public abstract class Agent implements Callable<String>{
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(Agent.class);
-	WebDriver driver = null;
+//	WebDriver driver = null;
 	protected Properties businessProps = null;
 	protected Properties applicationProps = null;
 	protected Endsites endsite = null;
 
-	public Agent(WebDriver driver) {
-		this.driver = driver;
+//	public Agent(WebDriver driver) {
+	public Agent() {
+//		this.driver = driver;
 		businessProps = Constants.getBusinessProps();
 		applicationProps = Constants.getApplicationProps();
 	}
 
-	public void searchAction(String query) throws InterruptedException {
+	public abstract void setJob(Job job);
+	public abstract Job getJob();
+	
+/*	public void searchAction(String query) throws InterruptedException {
 		WebElement searchTextbox = driver.findElement(By.xpath(businessProps
 				.getProperty("myntra.xpath.searchbox")));
 		WebElement searchButton = driver.findElement(By.xpath(businessProps
@@ -61,7 +66,7 @@ public abstract class Agent {
 		duration=System.currentTimeMillis()-start;
 		LOGGER.info("Search buttonclick duration:"+ ((int) (duration / 1000) % 60)+"s "+((int) (duration%1000))+"m");
 		
-	}
+	}*/
 
 	public WebElement waitAndExtractElement(WebElement elem,
 			ElementType elemType, String elemIdentifier) {
@@ -93,7 +98,7 @@ public abstract class Agent {
 
 	public abstract void scrapeAction(Job job) throws Exception;
 
-	public String getPageScreenshot(String jobId) throws IOException {
+	public String getPageScreenshot(WebDriver driver, String jobId) throws IOException {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screen = imgcapture.getScreenshotAs(OutputType.FILE);
 		String screenshotBasePath=applicationProps.getProperty("scraper.screenshot.path");
@@ -103,7 +108,7 @@ public abstract class Agent {
 		return fpath;
 	}
 
-	public String getElementScreenshot(WebElement elem, String elemName, String jobId) throws Exception {
+	public String getElementScreenshot(WebDriver driver, WebElement elem, String elemName, String jobId) throws Exception {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screenshot = imgcapture.getScreenshotAs(OutputType.FILE);
 		BufferedImage fullImg = ImageIO.read(screenshot);

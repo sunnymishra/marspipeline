@@ -128,7 +128,7 @@ MONGODB:
 Launch SeleniumStandaloneChrome:
 --------------------------------
 With Xvfb, Don't use sudo -> 
-xvfb-run -s "-screen 0, 1920x1520x24" -a java -Dwebdriver.server.session.timeout=31540000 -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
+xvfb-run -s "-screen 0, 1920x1520x24" -a java -Dwebdriver.server.session.timeout=315400 -Dwebdriver.chrome.driver=/usr/local/bin/chromedriver -jar /usr/local/bin/selenium-server-standalone.jar
 
 NOTE: The timeout is for 1 year period. After that Selenium Driver will shutdown and SpringScraper app will fail
 
@@ -171,7 +171,7 @@ POST http://localhost:3000/job
   "message":"rayban sunglasses"
 }
 
-GET http://localhost:3000/item/search/findByJobId?jobId=59be4e131083193ebcdfa761
+GET http://localhost:3000/item/59be4e131083193ebcdfa761
 GET http://localhost:3000/job/search/findById?jobId=59be4e131083193ebcdfa761
 curl -H "Content-Type: application/json" -X POST -d '{"message":"sunglasses"}' http://localhost:3000/job
 

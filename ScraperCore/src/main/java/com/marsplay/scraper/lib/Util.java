@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,5 +74,12 @@ public class Util {
 		long localDuration = System.currentTimeMillis() - startTime;
 		return ">>>>>>>>Duration "+work+":" + ((int) (localDuration / 1000) % 60)
 				+ "s " + ((int) (localDuration % 1000)) + "m";
+	}
+	public void sleep(int seconds) {
+		try {
+			TimeUnit.SECONDS.sleep(seconds);
+		} catch (InterruptedException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 }

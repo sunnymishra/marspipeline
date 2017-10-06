@@ -24,26 +24,25 @@ import com.marsplay.scraper.lib.Constants.Endsites;
 import com.marsplay.scraper.lib.Util;
 import com.mongodb.DuplicateKeyException;
 
-@Service("myntraAgent")
-public class MyntraAgent extends Agent implements Callable<String>{
+@Service("amazonAgent")
+public class AmazonAgent extends Agent {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScraperService.class);
 	@Autowired
 	private ItemRepository itemRepository;
 	
 	@Autowired
-	@Qualifier("myntraWebDriver")
+	@Qualifier("amazonWebDriver")
 	private WebDriver driver;
 	
 	private Job job;
 
 //	public MyntraAgent(WebDriver driver, ItemRepository itemRepository) {
-	public MyntraAgent() {
-//		super(driver);
+	public AmazonAgent() {
 		super();
-		LOGGER.info("Constructor MyntraAgent()");
+		LOGGER.info("Constructor AmazonAgent()");
 //		this.itemRepository = itemRepository;
-		this.endsite = Endsites.MYNTRA;
+		this.endsite = Endsites.AMAZON;
 		// PageFactory.initElements(driver, this);
 	}
 	@Override
@@ -51,7 +50,6 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		scrapeAction(job);
         return "success";
     }
-	@Override
 	public void setJob(Job job) {
 		this.job = job;
 	}
@@ -61,7 +59,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 	}
 	@Override
 	public void scrapeAction(Job job) throws Exception {
-		LOGGER.info("Scraping Myntra for Job '{}'", job);
+		LOGGER.info("Scraping Amazon for Job '{}'", job);
 		//Thread.sleep(1000);
 		long start=System.currentTimeMillis();
 		getPageScreenshot(driver, job.getId());	// Taking Page screenshot
@@ -79,7 +77,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 			// ItemVO itemVO = new ItemVO(Endsites.MYNTRA);
 			Item itemVO = new Item();
 			itemVO.setJob(job);
-			itemVO.setEndSite(Endsites.MYNTRA.name());
+			itemVO.setEndSite(Endsites.AMAZON.name());
 			++counter;
 //			getElementScreenshot(item, "item"+counter, job.getId());
 			// item.sendKeys( Keys.DOWN ); //simulate visual movement

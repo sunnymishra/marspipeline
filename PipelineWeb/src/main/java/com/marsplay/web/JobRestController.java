@@ -72,7 +72,7 @@ public class JobRestController {
 				Map<String, String> entity = new HashMap<String, String>();
 				entity.put("jobId", dbJob.getId());
 				success=true;
-				return new ResponseEntity<Object>(entity, HttpStatus.OK);
+				return new ResponseEntity<Object>(entity, HttpStatus.CREATED);
 			}
 			
 			// If NO then create new JOB in DB with status=SUBMITTED

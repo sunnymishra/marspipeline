@@ -1,10 +1,12 @@
 package com.marsplay.scraper.agents;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.eclipse.jetty.util.StringUtil;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -64,7 +66,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		LOGGER.info("Scraping Myntra for Job '{}'", job);
 		//Thread.sleep(1000);
 		long start=System.currentTimeMillis();
-		getPageScreenshot(driver, job.getId());	// Taking Page screenshot
+		capturePageScreenshot(driver, job.getId());	// Taking Page screenshot
 		LOGGER.info(Util.logTime(start, "PAGE_SCREENSHOT"));
 		
 		WebElement container = driver.findElement(By.xpath(businessProps
@@ -86,8 +88,16 @@ public class MyntraAgent extends Agent implements Callable<String>{
 			boolean isElementLoaded = false;
 			while (!isElementLoaded) {
 				try {
-					WebElement url = item.findElement(By.xpath(businessProps
-							.getProperty("myntra.relative.xpath.url")));
+					WebElement url = waitAndExtractElement(
+							item,
+							ElementType.XPATH,
+							businessProps
+									.getProperty("myntra.relative.xpath.url"));
+					String endsiteUrl = url.getAttribute("href");
+					if(StringUtil.isBlank(endsiteUrl)){
+						LOGGER.error("endsiteUrl not found. Skipping jobId:{} for Endsite:{}", job.getId(), endsite);
+						break;
+					}
 					itemVO.setEndsiteUrl(url.getAttribute("href"));
 					WebElement brand = item.findElement(By.xpath(businessProps
 							.getProperty("myntra.relative.xpath.brand")));
@@ -107,12 +117,17 @@ public class MyntraAgent extends Agent implements Callable<String>{
 								.getProperty("myntra.relative.xpath.price1")));
 //						getElementScreenshot(item, "priceA"+counter, job.getId());
 					} catch (org.openqa.selenium.NoSuchElementException e) {
-						price = item.findElement(By.xpath(businessProps
-								.getProperty("myntra.relative.xpath.price2")));
+						LOGGER.error("Price1 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:"+ itemVO.getEndsiteUrl()+"", e.getMessage());
+						try {
+							price = item.findElement(By.xpath(businessProps
+									.getProperty("myntra.relative.xpath.price2")));
+						} catch (org.openqa.selenium.NoSuchElementException e1) {
+							LOGGER.error("Price2 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:"+ itemVO.getEndsiteUrl()+"", e1.getMessage());
+						}
 //						getElementScreenshot(item, "priceB"+counter, job.getId());
 					}
 					try {
-						itemVO.setPrice(Util.formatMyntraPrice(price.getText()));
+						itemVO.setPrice(formatPrice(price.getText()));
 					} catch (IllegalArgumentException e) {
 						// TODO Log this error for Flagging Scraping error
 						e.printStackTrace();
@@ -139,8 +154,8 @@ public class MyntraAgent extends Agent implements Callable<String>{
 					isElementLoaded = true;
 				} catch (org.openqa.selenium.NoSuchElementException e) {
 					LOGGER.error(
-							"Failed to find element for JobId={}, ErrorMessage={}",
-							job.getId(), e.getMessage());
+							"Failed to find element for JobId="+job.getId()+", Endsite={}, ErrorMessage={}",
+							endsite, e.getMessage());
 					Thread.sleep(1000);
 					// TODO If this Exception times out, then Log this error for
 					// Flagging Scraping error
@@ -149,21 +164,29 @@ public class MyntraAgent extends Agent implements Callable<String>{
 					if (retry >= Integer.parseInt(businessProps
 							.getProperty("common.element_fetch_retry_max"))) {
 						LOGGER.error(
-								"We maxed out retries to find element for JobId={}, ErrorMessage={}. Throwing exception now.",
-								job.getId(), e.getMessage());
+								"We maxed out retries to find element for JobId="+job.getId()+", Endsite={}. ErrorMessage={}. Throwing exception now.",
+								endsite, e.getMessage());
 						throw e;
 					}
 				}
 
 			}
 			try {
-				start=System.currentTimeMillis();
-				Map<String, Object> responseMap = uploadFile(itemVO
-						.getEndsiteImageUrl());
-				LOGGER.info(Util.logTime(start, "CLOUDINARY_UPLOAD"));
+				if(!isElementLoaded){
+					LOGGER.error("Skipping jobId:{} for Endsite:{}", job.getId(), endsite);
+					break;
+				}
+				try {
+					start=System.currentTimeMillis();
+					Map<String, Object> responseMap = uploadFile(itemVO
+							.getEndsiteImageUrl());
+					LOGGER.info(Util.logTime(start, "CLOUDINARY_UPLOAD"));
 
-				itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
-				itemVO.setCdnImageId((String) responseMap.get("public_id"));
+					itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
+					itemVO.setCdnImageId((String) responseMap.get("public_id"));
+				} catch (Exception e) {
+					LOGGER.error("Cloudinary_upload_exception for Job:"+job.getId() + " Endsite:{}, itemUrl:{}",endsite, itemVO.getEndsiteUrl());
+				}
 				
 				start=System.currentTimeMillis();
 				itemRepository.save(itemVO);
@@ -173,9 +196,9 @@ public class MyntraAgent extends Agent implements Callable<String>{
 				Throwable rootException = ExceptionUtils.getRootCause(e);
 				if (rootException instanceof DuplicateKeyException) {
 					// Eat exception here else throw exception
-					LOGGER.warn("Eating Mongo DuplicateKeyException here in Extractor");
+					LOGGER.warn("Eating Mongo DuplicateKeyException here in Extractor for Job:"+job.getId()+" endsite:{}, itemUrl:{}",endsite, itemVO.getEndsiteUrl());
 				} else {
-					throw e;
+					LOGGER.error("Mongo save exception for JobId:"+job.getId()+", Endsite:{}, itemUrl:{}",endsite, itemVO.getEndsiteUrl());
 				}
 
 			} // MongoDB save in ITEM collection
@@ -200,5 +223,28 @@ public class MyntraAgent extends Agent implements Callable<String>{
 
 		}
 	}
-
+	/**
+	 * Myntra Scraped Price eg. "Rs. 500". This Util method
+	 * trims the String and strips Alphabets 'Rs.' and then
+	 * returns parsed Double of the price
+	 * @param String
+	 * @return double
+	 */
+	public BigDecimal formatPrice(String price){
+		String priceTemp=price;
+		if(priceTemp==null || priceTemp.isEmpty())
+			throw new IllegalArgumentException("Price cannot be empty");
+		priceTemp=priceTemp.trim();
+		if(priceTemp.startsWith(businessProps.getProperty("myntra.price.extratext"))){
+			priceTemp=priceTemp.substring(3);
+			priceTemp=priceTemp.trim();
+		}
+		BigDecimal price1;
+		try {
+			price1 = new BigDecimal(priceTemp);
+		} catch (NumberFormatException e) {
+			throw new IllegalArgumentException("Not able to parse price:\""+price+"\"",e);
+		}
+		return price1;
+	}
 }

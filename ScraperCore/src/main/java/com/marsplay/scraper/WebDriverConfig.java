@@ -39,7 +39,7 @@ public class WebDriverConfig {
 		return myntraDriver;
 	}
 
-	@Bean("amazonWebDriver")
+/*	@Bean("amazonWebDriver")
 	public WebDriver amazonWebDriver() throws IOException {
 		LOGGER.info("#######Initializing Amazon Chrome...");
 		ChromeOptions options = new ChromeOptions();
@@ -55,6 +55,6 @@ public class WebDriverConfig {
 				.getProperty("common.page_load_timeout_seconds")),
 				TimeUnit.SECONDS);
 		return amazonDriver;
-	}
+	}*/
 
 }

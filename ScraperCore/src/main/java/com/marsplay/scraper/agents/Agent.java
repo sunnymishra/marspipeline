@@ -3,6 +3,10 @@ package com.marsplay.scraper.agents;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
@@ -12,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.jsoup.helper.StringUtil;
+import org.jsoup.nodes.Document;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
@@ -24,12 +30,13 @@ import org.slf4j.LoggerFactory;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.google.common.base.Function;
+import com.marsplay.repository.Item;
 import com.marsplay.repository.Job;
-import com.marsplay.scraper.ScraperService;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
 import com.marsplay.scraper.lib.Constants.ElementType;
 import com.marsplay.scraper.lib.Constants.Endsites;
+import com.marsplay.scraper.lib.Constants.ItemAttribute;
 import com.marsplay.scraper.lib.FluentElementWait;
 import com.marsplay.scraper.lib.Util;
 
@@ -98,17 +105,16 @@ public abstract class Agent implements Callable<String>{
 
 	public abstract void scrapeAction(Job job) throws Exception;
 
-	public String getPageScreenshot(WebDriver driver, String jobId) throws IOException {
+	public String capturePageScreenshot(WebDriver driver, String jobId) throws IOException {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screen = imgcapture.getScreenshotAs(OutputType.FILE);
 		String screenshotBasePath=applicationProps.getProperty("scraper.screenshot.path");
-		String fpath = screenshotBasePath + File.separator + "page."+endsite+".jobId." + jobId + "."+ Util.getTime()
-				+ ".png";
+		String fpath = screenshotBasePath + File.separator + "page."+endsite+".jobId." + jobId	+ ".png";
 		FileUtils.copyFile(screen, new File(fpath));
 		return fpath;
 	}
 
-	public String getElementScreenshot(WebDriver driver, WebElement elem, String elemName, String jobId) throws Exception {
+	public String captureElementScreenshot(WebDriver driver, WebElement elem, String elemName, String jobId) throws Exception {
 		TakesScreenshot imgcapture = (TakesScreenshot) driver;
 		File screenshot = imgcapture.getScreenshotAs(OutputType.FILE);
 		BufferedImage fullImg = ImageIO.read(screenshot);
@@ -132,7 +138,15 @@ public abstract class Agent implements Callable<String>{
 		FileUtils.copyFile(screenshot, new File(path));
 		return path;
 	}
-
+	
+	public void saveScrapedHtml(Document doc, String jobId) throws IOException {
+		String htmlBasePath = applicationProps.getProperty("scraper.html.path");
+		if (!Files.exists(Paths.get(htmlBasePath)))
+		    Files.createDirectories(Paths.get(htmlBasePath));
+		String fpath = htmlBasePath + File.separator + endsite +".jobId." + jobId + ".html";
+		Files.write(Paths.get(fpath), doc.toString().getBytes());
+	}
+	
 	public Map<String, Object> uploadFile(String imageUrl) throws IOException {
 		// new PhotoUploadValidator().validate(photoUpload, result);
 		Map uploadResult = null;
@@ -144,4 +158,43 @@ public abstract class Agent implements Callable<String>{
 								endsite));
 		return uploadResult;
 	}
+	public void validateScrapedHtml(String jobId, Item item){
+		List<ItemAttribute> errorProperties = new ArrayList<ItemAttribute>();
+		
+		if(!isAttributeIgnorable(ItemAttribute.BRAND) && StringUtil.isBlank(item.getBrand())){
+			errorProperties.add(ItemAttribute.BRAND);
+		}
+		if(!isAttributeIgnorable(ItemAttribute.IMAGEURL) && StringUtil.isBlank(item.getEndsiteImageUrl())){
+			errorProperties.add(ItemAttribute.IMAGEURL);
+		}
+		if(!isAttributeIgnorable(ItemAttribute.NAME) && StringUtil.isBlank(item.getName())){
+			errorProperties.add(ItemAttribute.NAME);
+		}
+		if(!isAttributeIgnorable(ItemAttribute.PRICE) && item.getPrice()==null){
+			errorProperties.add(ItemAttribute.PRICE);
+		}
+		if(!errorProperties.isEmpty())
+			LOGGER.error("ATTRIBUTE_NOT_FOUND Job:"+jobId+", Endsite:"+endsite+", itemUrl:{}, Attributes Missing: "
+				, item.getEndsiteUrl(), errorProperties);
+//		return errorProperties;
+		
+	}
+	/**
+	 * This method tells whether it is okay to ignore a certain attribute of 
+	 * any Endsite's properties. For eg. For Amazon BRAND is always blank in UI.
+	 * So we will ignore that Item attribute and not log any error also.
+	 * 
+	 * @param attr
+	 * @return
+	 */
+	private boolean isAttributeIgnorable(ItemAttribute attr){
+		String itemAttrPath=endsite.name()+".relative.xpath."+attr.name();
+		return StringUtil.isBlank(businessProps.getProperty(itemAttrPath));
+	}
+	
+	
+	
+	
+	
+	
 }

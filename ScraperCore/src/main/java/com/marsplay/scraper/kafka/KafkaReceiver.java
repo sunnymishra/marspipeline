@@ -37,7 +37,11 @@ public class KafkaReceiver {
 //	public void doSomething(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String key, @Payload String payload) {
 		long start=System.currentTimeMillis();
 		LOGGER.info("#####KafkaListener payload='{}', partitionId='{}'", job, partition);
-		scraper.startScraping(job);
+		try {
+			scraper.startScraping(job);
+		} catch (Exception e) {
+			LOGGER.error("Eating complete invokation exception in kafkaReceiver for job:"+job.getId(), e);
+		}
 		LOGGER.info("#####KafkaListener Completed jobId={}",job.getId());
 		LOGGER.info(Util.logTime(start, "SCRAPE_COMPLETE"));
 	}

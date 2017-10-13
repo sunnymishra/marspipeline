@@ -46,13 +46,13 @@ public class ScraperService implements CommandLineRunner {
 	@Autowired
 	@Qualifier("myntraWebDriver")
 	private WebDriver myntraWebDriver;
-	@Autowired
-	@Qualifier("amazonWebDriver")
-	private WebDriver amazonWebDriver;
-	// private String query = "sunglasses men";
+
 	Properties businessProps;
 	Properties applicationProps;
-//	Agent myntraAgent = null;
+	
+	@Autowired
+	@Qualifier("amazonAgent")
+	private Agent amazonAgent;
 	
 	@Autowired
 	@Qualifier("myntraAgent")
@@ -63,8 +63,8 @@ public class ScraperService implements CommandLineRunner {
 	@Autowired
 	private JobRepository jobRepository;
 
-	@Value("${selenium.server.url}")
-	private String seleniumServerUrl;
+//	@Value("${selenium.server.url}")
+//	private String seleniumServerUrl;
 
 	@Override
 	public void run(String... arg0) throws Exception {
@@ -79,7 +79,7 @@ public class ScraperService implements CommandLineRunner {
 			CloudinarySingleton
 					.registerCloudinary(new Cloudinary(cloudinaryUrl));
 		
-		startScraping(new Job("sunglasses", new Date()));
+	//	startScraping(new Job("sunglasses", new Date()));
 //		startScraping(new Job("polka dots dress", new Date()));
 //		startScraping(new Job("polka dots shirt", new Date()));
 //		startScraping(new Job("polka dots tshirt", new Date()));
@@ -90,12 +90,10 @@ public class ScraperService implements CommandLineRunner {
 		long localStart = System.currentTimeMillis();
 //		extractor.searchAction(job.getMessage());
 		try {
-			myntraWebDriver.get(businessProps.getProperty("myntra.url")+job.getMessage());
+//			myntraWebDriver.get(businessProps.getProperty("myntra.endsite.url")+job.getMessage());
 //			driver.manage().window().maximize();
 			LOGGER.info("#######Launched Endsite successfully");
-//			Thread.sleep(1000);
 		} catch (org.openqa.selenium.TimeoutException e) {
-			// TODO Auto-generated catch block
 			LOGGER.error("Could not open Myntra endsite", e);
 		}
 		LOGGER.info(Util.logTime(localStart, "ENDITE_MYNTRA_OPEN"));
@@ -109,7 +107,7 @@ public class ScraperService implements CommandLineRunner {
 			LOGGER.info(Util.logTime(localStart, "MONGO_UPDATE_JOB"));
 
 			localStart = System.currentTimeMillis();
-			myntraAgent.scrapeAction(job);	// This code will scrape the EndSite
+			amazonAgent.scrapeAction(job);	// This code will scrape the EndSite
 			LOGGER.info(Util.logTime(localStart, "SCRAPE_WORK"));
 
 			localStart = System.currentTimeMillis();

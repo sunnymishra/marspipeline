@@ -21,6 +21,10 @@ public class Constants {
 	public enum ElementType{
 		ID, XPATH, CSS
 	}
+
+	public enum ItemAttribute{
+		URL, BRAND, NAME, PRICE, IMAGEURL
+	}
 	
 	/**
 	 * Public method will return the Business properties file read into the Properties instance. {{Initialize Once in static block, use many times}}

@@ -39,22 +39,4 @@ public class WebDriverConfig {
 		return myntraDriver;
 	}
 
-/*	@Bean("amazonWebDriver")
-	public WebDriver amazonWebDriver() throws IOException {
-		LOGGER.info("#######Initializing Amazon Chrome...");
-		ChromeOptions options = new ChromeOptions();
-		System.setProperty("webdriver.chrome.driver",
-				applicationProps.getProperty("chrome.driver.path"));
-		options.addArguments("--headless", "--disable-gpu",
-				"--window-size=1920,1520"); // 1280,1696
-
-		WebDriver amazonDriver = new ChromeDriver(options);
-
-		Timeouts amazonTimeouts = amazonDriver.manage().timeouts();
-		amazonTimeouts.pageLoadTimeout(Long.parseLong(businessProps
-				.getProperty("common.page_load_timeout_seconds")),
-				TimeUnit.SECONDS);
-		return amazonDriver;
-	}*/
-
 }

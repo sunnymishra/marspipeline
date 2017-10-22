@@ -1,30 +1,23 @@
 package com.marsplay.scraper.agents;
 
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import us.codecraft.xsoup.Xsoup;
@@ -33,7 +26,6 @@ import com.marsplay.repository.Item;
 import com.marsplay.repository.ItemRepository;
 import com.marsplay.repository.Job;
 import com.marsplay.scraper.ScraperService;
-import com.marsplay.scraper.lib.Constants.ElementType;
 import com.marsplay.scraper.lib.Constants.Endsites;
 import com.marsplay.scraper.lib.Util;
 import com.mongodb.DuplicateKeyException;
@@ -45,8 +37,6 @@ public class AmazonAgent extends Agent {
 	@Autowired
 	private ItemRepository itemRepository;
 
-	private Job job;
-
 	public AmazonAgent() {
 		super();
 		LOGGER.info("Constructor AmazonAgent()");
@@ -54,26 +44,8 @@ public class AmazonAgent extends Agent {
 		this.endsite = Endsites.AMAZON;
 		// PageFactory.initElements(driver, this);
 	}
-
 	@Override
-	public String call() throws Exception {
-		scrapeAction(job);
-		return "success";
-	}
-
-	public void setJob(Job job) {
-		this.job = job;
-	}
-
-	@Override
-	public Job getJob() {
-		return this.job;
-	}
-
-	@Override
-	public void scrapeAction(Job job) throws Exception {
-		LOGGER.info("Scraping {} for Job '{}'", endsite, job);
-
+	public Object launchEndsite(Job job) throws Exception {
 		String endsiteBaseUrl = businessProps.getProperty("amazon.endsite.url");
 		String endsiteUrl = endsiteBaseUrl + job.getMessage();
 		/*
@@ -82,13 +54,35 @@ public class AmazonAgent extends Agent {
 		 * Jsoup.parse(htmlStr);
 		 */
 		long start = System.currentTimeMillis();
-		int pageLoadTimeout=(int)TimeUnit.SECONDS.toMillis(Long.parseLong(businessProps.getProperty("common.page_load_timeout_seconds")));
-		Document document = Jsoup.connect(endsiteUrl)
-								 .timeout(pageLoadTimeout)
-								 .get();
-		LOGGER.info(Util.logTime(start, "ENDITE_AMAZON_OPEN"));
+		int pageLoadTimeout = (int) TimeUnit.SECONDS.toMillis(Long
+				.parseLong(businessProps
+						.getProperty("common.page_load_timeout_seconds")));
+		// Document document = Jsoup.connect(endsiteUrl)
+		// .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
+		// .timeout(pageLoadTimeout)
+		// .get();
+		Connection con = Jsoup
+				.connect(endsiteUrl)
+				.userAgent(
+						"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
+				.timeout(pageLoadTimeout);
+		Connection.Response resp = con.execute();
+		if (resp.statusCode() != 200)
+			throw new HttpStatusException("Couldn't fetch Endsite url",
+					resp.statusCode(), endsiteUrl);
+		Document document = con.get();
 
-		start = System.currentTimeMillis();
+		LOGGER.info(Util.logTime(start, "ENDITE_AMAZON_OPEN"));
+		return document;
+
+	}
+	@Override
+	public void scrapeAction(Job job) throws Exception {
+		LOGGER.info("Scraping {} for Job '{}'", endsite, job);
+
+		Document document = (Document)launchEndsite(job);
+		
+		long start = System.currentTimeMillis();
 		saveScrapedHtml(document, job.getId()); // Saving Scraped Html
 		LOGGER.info(Util.logTime(start, "SAVE_AMAZON_HTML"));
 
@@ -108,7 +102,7 @@ public class AmazonAgent extends Agent {
 			Item itemVO = new Item();
 			itemVO.setJob(job);
 			itemVO.setEndSite(endsite.name());
-			
+
 			Elements urlElem = Xsoup
 					.compile(
 							businessProps
@@ -176,9 +170,11 @@ public class AmazonAgent extends Agent {
 							e1.getMessage());
 				}
 			}
-			
-			validateScrapedHtml(job.getId(), itemVO);	// This will log what itemVO attributes were not found
-			
+
+			validateScrapedHtml(job.getId(), itemVO); // This will log what
+														// itemVO attributes
+														// were not found
+
 			try {
 				start = System.currentTimeMillis();
 				Map<String, Object> responseMap = uploadFile(itemVO
@@ -188,8 +184,9 @@ public class AmazonAgent extends Agent {
 				itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
 				itemVO.setCdnImageId((String) responseMap.get("public_id"));
 			} catch (Exception e) {
-				LOGGER.error("Cloudinary_upload_exception for Job:{}, Endsite:{}, itemUrl:{} "
-						, job.getId(), endsite ,itemVO.getEndsiteUrl());
+				LOGGER.error(
+						"Cloudinary_upload_exception for Job:{}, Endsite:{}, itemUrl:{} ",
+						job.getId(), endsite, itemVO.getEndsiteUrl());
 				exceptionSkippingCounter++;
 				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
 					LOGGER.error(

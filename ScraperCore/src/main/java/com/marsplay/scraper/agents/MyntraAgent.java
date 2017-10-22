@@ -37,8 +37,6 @@ public class MyntraAgent extends Agent implements Callable<String>{
 	@Qualifier("myntraWebDriver")
 	private WebDriver driver;
 	
-	private Job job;
-
 //	public MyntraAgent(WebDriver driver, ItemRepository itemRepository) {
 	public MyntraAgent() {
 //		super(driver);
@@ -48,21 +46,28 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		this.endsite = Endsites.MYNTRA;
 		// PageFactory.initElements(driver, this);
 	}
+	
+	
 	@Override
-    public String call() throws Exception {
-		scrapeAction(job);
-        return "success";
-    }
-	@Override
-	public void setJob(Job job) {
-		this.job = job;
+	public Object launchEndsite(Job job) {
+		long localStart = System.currentTimeMillis();
+		// extractor.searchAction(job.getMessage());
+		try {
+			// The below line will open the endsite on the headless browser
+			driver.get(businessProps.getProperty("myntra.endsite.url")
+					+ job.getMessage());
+			// driver.manage().window().maximize();
+			LOGGER.info("#######Selenium Launched Endsite successfully");
+		} catch (org.openqa.selenium.TimeoutException e) {
+			LOGGER.error("Could not open Myntra endsite", e);
+		}
+		LOGGER.info(Util.logTime(localStart, "ENDITE_MYNTRA_OPEN"));
+		return null;
 	}
-	@Override
-	public Job getJob() {
-		return this.job;
-	}
+	
 	@Override
 	public void scrapeAction(Job job) throws Exception {
+		launchEndsite(job);
 		LOGGER.info("Scraping Myntra for Job '{}'", job);
 		//Thread.sleep(1000);
 		long start=System.currentTimeMillis();
@@ -117,12 +122,12 @@ public class MyntraAgent extends Agent implements Callable<String>{
 								.getProperty("myntra.relative.xpath.price1")));
 //						getElementScreenshot(item, "priceA"+counter, job.getId());
 					} catch (org.openqa.selenium.NoSuchElementException e) {
-						LOGGER.error("Price1 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:"+ itemVO.getEndsiteUrl()+"", e.getMessage());
+						LOGGER.warn("Price1 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:{}", itemVO.getEndsiteUrl(), e.getMessage());
 						try {
 							price = item.findElement(By.xpath(businessProps
 									.getProperty("myntra.relative.xpath.price2")));
 						} catch (org.openqa.selenium.NoSuchElementException e1) {
-							LOGGER.error("Price2 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:"+ itemVO.getEndsiteUrl()+"", e1.getMessage());
+							LOGGER.error("Price2 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:{}", itemVO.getEndsiteUrl(), e1.getMessage());
 						}
 //						getElementScreenshot(item, "priceB"+counter, job.getId());
 					}
@@ -223,6 +228,8 @@ public class MyntraAgent extends Agent implements Callable<String>{
 
 		}
 	}
+
+	
 	/**
 	 * Myntra Scraped Price eg. "Rs. 500". This Util method
 	 * trims the String and strips Alphabets 'Rs.' and then

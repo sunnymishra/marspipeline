@@ -15,13 +15,16 @@ App can fetch everything else in 1st call and then later fetch image.
 - Use Cloudinary callback url
 - Have intermediate status when everything else is loaded in db except image url.
 
-- Amazon *Sponsored Products* need to be filtered from Result list
+- Amazon *Sponsored Products* need to be filtered out from Result list
+- Myntra/Amazon/etc if search text returned no results, then appropriate action needs to be taken
 - Take screenshot only when an exception occurs. Don't take any screenshot for same Job if once taken.
 - All *Duration* audit logs should have Job Id and AgentName
 - Build an analytics tool to analyse and report errors and job durations and drill downs
-
+- Add status for individual Endsites in DB
+- If CancellationException happens in Callable class, the Thread continues to run even after future.get() is invoked. This needs to be stopped
 
 Endsites: Myntra, Amazon, Flipkart, Nykaa, Koovs (new) 
+
 Job
 ----
 _id
@@ -37,12 +40,3 @@ original_filename=11482126737792-Floyd-Unisex-Aviator-sunglasses-458148212673767
 bytes=2769, width=180, 
 etag=9359e29849da7767f5e5659241441c6d, height=240}
 
-
-
-Document doc = Jsoup.connect("http://www.facebook.com")
-.data("email", "myemailid")
-.data("pass", "mypassword")
-// and other hidden fields which are being passed in post request.
-.userAgent("Mozilla")
-.post();
-System.out.println(doc);

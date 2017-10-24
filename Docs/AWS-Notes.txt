@@ -141,7 +141,7 @@ sudo netstat -nlp | grep 9515
 ps -ef | grep chrome
 sudo kill -9 <PID>
 
-
+4444
 
 UBUNTU Generic:
 ---------------
@@ -156,12 +156,12 @@ SOURCE CODE:
 -------------
 https://sunnymishra@bitbucket.org/martianplayer/aggregation-pipeline.git
 
-sudo vi /opt/project/Pipeline/PipelineWeb/src/main/resources/application.properties
-sudo nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &
+vi /opt/project/Pipeline/PipelineWeb/src/main/resources/application.properties
+nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &
 
-sudo vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
-sudo vi /opt/project/Pipeline/ScraperCore/src/main/resources/application.properties
-sudo nohup java -jar /opt/project/Pipeline/ScraperCore/target/ScraperCore-1.0.0-exec.jar &
+vi /opt/project/Pipeline/ScraperCore/src/main/java/com/marsplay/scraper/ScraperService.java
+vi /opt/project/Pipeline/ScraperCore/src/main/resources/application.properties
+nohup java -jar /opt/project/Pipeline/ScraperCore/target/ScraperCore-1.0.0-exec.jar &
 
 sudo mvn clean install
 sudo nohup java -jar /opt/project/Pipeline/PipelineWeb/target/PipelineWeb-1.0.0-exec.jar &

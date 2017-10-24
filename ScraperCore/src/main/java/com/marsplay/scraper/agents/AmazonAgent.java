@@ -3,6 +3,7 @@ package com.marsplay.scraper.agents;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -44,9 +45,11 @@ public class AmazonAgent extends Agent {
 		this.endsite = Endsites.AMAZON;
 		// PageFactory.initElements(driver, this);
 	}
+
 	@Override
 	public Object launchEndsite(Job job) throws Exception {
-		String endsiteBaseUrl = businessProps.getProperty("amazon.endsite.url");
+		String endsiteBaseUrl = businessProps
+				.getProperty("amazon.endsite.searchurl");
 		String endsiteUrl = endsiteBaseUrl + job.getMessage();
 		/*
 		 * byte[] fileBytes = Files.readAllBytes(Paths.get("D:/amazon.html"));
@@ -72,25 +75,36 @@ public class AmazonAgent extends Agent {
 					resp.statusCode(), endsiteUrl);
 		Document document = con.get();
 
-		LOGGER.info(Util.logTime(start, "ENDITE_AMAZON_OPEN"));
+		LOGGER.info(Util.logTime(job, endsite, "ENDITE_AMAZON_OPEN", start));
 		return document;
 
 	}
+
 	@Override
 	public void scrapeAction(Job job) throws Exception {
 		LOGGER.info("Scraping {} for Job '{}'", endsite, job);
 
-		Document document = (Document)launchEndsite(job);
-		
+		Document document = (Document) launchEndsite(job);
+
 		long start = System.currentTimeMillis();
 		saveScrapedHtml(document, job.getId()); // Saving Scraped Html
-		LOGGER.info(Util.logTime(start, "SAVE_AMAZON_HTML"));
+		LOGGER.info(Util.logTime(job, endsite, "SAVE_AMAZON_HTML", start));
 
 		Elements itemContainer = Xsoup
 				.compile(businessProps.getProperty("amazon.xpath.container"))
 				.evaluate(document).getElements();
+		if (itemContainer.isEmpty()) {
+			LOGGER.error(endsite + "." + job.getId()
+					+ ".PARSING_FAILURE_EMPTY_CONTAINER");
+			return;
+		}
 		Elements itemContainer1 = itemContainer.select(businessProps
 				.getProperty("amazon.xpath.item"));
+		if (itemContainer1.isEmpty()) {
+			LOGGER.error(endsite + "." + job.getId()
+					+ ".PARSING_FAILURE_EMPTY_SUB_CONTAINER");
+			return;
+		}
 		int counter = 0;
 		int exceptionSkippingCounter = 0;
 		String exceptionSkippingMaxCountStr = businessProps
@@ -103,25 +117,47 @@ public class AmazonAgent extends Agent {
 			itemVO.setJob(job);
 			itemVO.setEndSite(endsite.name());
 
+			Elements sponsoredElem1 = Xsoup
+					.compile(
+							businessProps
+									.getProperty("amazon.relative.xpath.sponsoreditem"))
+					.evaluate(item).getElements();
+			if (!sponsoredElem1.isEmpty()) {
+				LOGGER.warn(endsite + "." + job.getId()
+						+ ".FOUND_SPONSORED_ELEMENT__SKIPPING");
+				continue;
+			}
+
 			Elements urlElem = Xsoup
 					.compile(
 							businessProps
-									.getProperty("amazon.relative.xpath.url"))
+									.getProperty("amazon.relative.xpath.url1"))
 					.evaluate(item).getElements();
-			itemVO.setEndsiteUrl(urlElem.attr("href"));
-			if (StringUtil.isBlank(itemVO.getEndsiteUrl())) {
-				LOGGER.error(
-						"endsiteUrl not found. Skipping jobId:{} for Endsite:{}",
-						job.getId(), endsite.name());
-				exceptionSkippingCounter++;
-				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
-					LOGGER.error(
-							"exceptionSkippingCounter breached max for JobId:{} and Endsite:{}",
-							job.getId(), endsite.name());
-					break;
-				} else
-					continue;
+			if (urlElem.isEmpty()) {
+				LOGGER.warn(endsite + "." + job.getId()
+						+ ".NOT_FOUND_ENDSITE_URL1__TRYING_URL2");
+
+				urlElem = Xsoup
+						.compile(
+								businessProps
+										.getProperty("amazon.relative.xpath.url2"))
+						.evaluate(item).getElements();
+				if (urlElem.isEmpty()) {
+					LOGGER.error(endsite + "." + job.getId()
+							+ ".NOT_FOUND_ENDSITE_URL2__SKIPPING_ITEM");
+					exceptionSkippingCounter++;
+					if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
+						LOGGER.error(endsite
+								+ "."
+								+ job.getId()
+								+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
+						break;
+					} else
+						continue;
+				}
 			}
+			itemVO.setEndsiteUrl(urlElem.attr("href"));
+
 			++counter;
 
 			String brandPath = businessProps
@@ -145,6 +181,36 @@ public class AmazonAgent extends Agent {
 							businessProps
 									.getProperty("amazon.relative.xpath.image1"))
 					.evaluate(item).getElements();
+			if (image.isEmpty()) {
+				LOGGER.warn(
+						endsite
+								+ "."
+								+ job.getId()
+								+ ".NOT_FOUND_IMAGE_URL1__TRYING_IMAGE_URL2.endsiteUrl:{}",
+						itemVO.getEndsiteUrl());
+				image = Xsoup
+						.compile(
+								businessProps
+										.getProperty("amazon.relative.xpath.image2"))
+						.evaluate(item).getElements();
+				if (image.isEmpty()) {
+					LOGGER.warn(
+							endsite
+									+ "."
+									+ job.getId()
+									+ ".NOT_FOUND_IMAGE_URL2__MAY_IGNORE.endsiteUrl:{}",
+							itemVO.getEndsiteUrl());
+					exceptionSkippingCounter++;
+					if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
+						LOGGER.error(endsite
+								+ "."
+								+ job.getId()
+								+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
+						break;
+					}
+				}
+
+			}
 			itemVO.setEndsiteImageUrl(image.attr("src"));
 			Elements price = Xsoup
 					.compile(
@@ -174,50 +240,51 @@ public class AmazonAgent extends Agent {
 			validateScrapedHtml(job.getId(), itemVO); // This will log what
 														// itemVO attributes
 														// were not found
-
 			try {
 				start = System.currentTimeMillis();
 				Map<String, Object> responseMap = uploadFile(itemVO
 						.getEndsiteImageUrl());
-				LOGGER.info(Util.logTime(start, "CLOUDINARY_UPLOAD"));
+				LOGGER.info(Util.logTime(job, endsite, "CLOUDINARY_UPLOAD",
+						start));
 
 				itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
 				itemVO.setCdnImageId((String) responseMap.get("public_id"));
 			} catch (Exception e) {
-				LOGGER.error(
-						"Cloudinary_upload_exception for Job:{}, Endsite:{}, itemUrl:{} ",
-						job.getId(), endsite, itemVO.getEndsiteUrl());
+				LOGGER.error(endsite + "." + job.getId()
+						+ ".CLOUDINARY_UPLOAD_EXCEPTION", e);
 				exceptionSkippingCounter++;
 				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
 					LOGGER.error(
-							"exceptionSkippingCounter breached max for JobId:{} and itemUrl:{}",
-							job.getId(), itemVO.getEndsiteUrl());
+							endsite
+									+ "."
+									+ job.getId()
+									+ ".CLOUDINARY_UPLOAD_EXCEPTION__SKIPPING_ITEM. itemUrl:{}",
+							itemVO.getEndsiteUrl());
 					break;
-				} else
-					continue;
+				}
 			}
 			try {
 				start = System.currentTimeMillis();
 				itemRepository.save(itemVO);
-				LOGGER.info(Util.logTime(start, "MONGO_SAVE_ITEM"));
+				LOGGER.info(Util
+						.logTime(job, endsite, "MONGO_SAVE_ITEM", start));
 			} catch (Exception e) {
 				// e.printStackTrace();
 				Throwable rootException = ExceptionUtils.getRootCause(e);
 				if (rootException instanceof DuplicateKeyException) {
 					// Eat exception here else throw exception
-					LOGGER.warn("Eating Mongo DuplicateKeyException here in Extractor for Job:"
-							+ job.getId()
-							+ " itemUrl:"
-							+ itemVO.getEndsiteUrl());
+					LOGGER.warn(endsite + "." + job.getId()
+							+ ".MONGO_DuplicateKeyException_EATING itemUrl:{}",
+							itemVO.getEndsiteUrl());
 				} else {
-					LOGGER.error(
-							"Mongo save exception for JobId:{} and itemUrl:{}",
-							job.getId(), itemVO.getEndsiteUrl());
+					LOGGER.error(endsite + "." + job.getId()
+							+ ".MONGO_SAVE_FAILURE itemUrl:{}",
+							itemVO.getEndsiteUrl(), e);
 					exceptionSkippingCounter++;
 					if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
-						LOGGER.error(
-								"exceptionSkippingCounter breached max for JobId:{} and itemUrl:{}",
-								job.getId(), itemVO.getEndsiteUrl());
+						LOGGER.error(endsite + "." + job.getId()
+								+ ".EXCEPTION_SKIPPED_COUNTER itemUrl:{}",
+								itemVO.getEndsiteUrl(), e);
 						break;
 					} else
 						continue;

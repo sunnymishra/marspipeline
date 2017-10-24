@@ -43,7 +43,7 @@ public class KafkaReceiver {
 			LOGGER.error("Eating complete invokation exception in kafkaReceiver for job:"+job.getId(), e);
 		}
 		LOGGER.info("#####KafkaListener Completed jobId={}",job.getId());
-		LOGGER.info(Util.logTime(start, "SCRAPE_COMPLETE"));
+		LOGGER.info(Util.logTime(job, null, "SCRAPE_COMPLETE", start));
 	}
 	
 }

@@ -142,11 +142,12 @@ public class Item {
 
 	@Override
 	public String toString() {
-		return "Item [id=" + id + ", endsiteUrl=" + endsiteUrl + ", job=" + job
+		return "Item [id=" + id + ", endsiteUrl=" + endsiteUrl 
 				+ ", name=" + name + ", brand=" + brand + ", endSite="
 				+ endSite + ", endsiteImageUrl=" + endsiteImageUrl
 				+ ", cdnImageUrl=" + cdnImageUrl + ", cdnImageId=" + cdnImageId
-				+ ", price=" + price + ", createdDate=" + createdDate + "]";
+				+ ", price=" + price + ", createdDate=" + createdDate 
+				+ ", job=" + job + "]";
 	}
 
 

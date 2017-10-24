@@ -54,14 +54,14 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		// extractor.searchAction(job.getMessage());
 		try {
 			// The below line will open the endsite on the headless browser
-			driver.get(businessProps.getProperty("myntra.endsite.url")
+			driver.get(businessProps.getProperty("myntra.endsite.searchurl")
 					+ job.getMessage());
 			// driver.manage().window().maximize();
 			LOGGER.info("#######Selenium Launched Endsite successfully");
 		} catch (org.openqa.selenium.TimeoutException e) {
 			LOGGER.error("Could not open Myntra endsite", e);
 		}
-		LOGGER.info(Util.logTime(localStart, "ENDITE_MYNTRA_OPEN"));
+		LOGGER.info(Util.logTime(job, endsite, "ENDITE_MYNTRA_OPEN", localStart));
 		return null;
 	}
 	
@@ -72,7 +72,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		//Thread.sleep(1000);
 		long start=System.currentTimeMillis();
 		capturePageScreenshot(driver, job.getId());	// Taking Page screenshot
-		LOGGER.info(Util.logTime(start, "PAGE_SCREENSHOT"));
+		LOGGER.info(Util.logTime(job, endsite, "PAGE_SCREENSHOT", start));
 		
 		WebElement container = driver.findElement(By.xpath(businessProps
 				.getProperty("myntra.xpath.container")));
@@ -97,7 +97,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 							item,
 							ElementType.XPATH,
 							businessProps
-									.getProperty("myntra.relative.xpath.url"));
+									.getProperty("myntra.relative.xpath.url1"));
 					String endsiteUrl = url.getAttribute("href");
 					if(StringUtil.isBlank(endsiteUrl)){
 						LOGGER.error("endsiteUrl not found. Skipping jobId:{} for Endsite:{}", job.getId(), endsite);
@@ -114,7 +114,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 							.getProperty("myntra.relative.xpath.name")));
 					itemVO.setName(name.getText());
 //					getElementScreenshot(item, "name"+counter, job.getId());
-					LOGGER.info(itemVO.toString());
+//					LOGGER.info(itemVO.toString());
 
 					WebElement price = null;
 					try {
@@ -185,7 +185,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 					start=System.currentTimeMillis();
 					Map<String, Object> responseMap = uploadFile(itemVO
 							.getEndsiteImageUrl());
-					LOGGER.info(Util.logTime(start, "CLOUDINARY_UPLOAD"));
+					LOGGER.info(Util.logTime(job, endsite, "CLOUDINARY_UPLOAD", start));
 
 					itemVO.setCdnImageUrl((String) responseMap.get("secure_url"));
 					itemVO.setCdnImageId((String) responseMap.get("public_id"));
@@ -195,15 +195,17 @@ public class MyntraAgent extends Agent implements Callable<String>{
 				
 				start=System.currentTimeMillis();
 				itemRepository.save(itemVO);
-				LOGGER.info(Util.logTime(start, "MONGO_SAVE_ITEM"));
+				LOGGER.info(Util.logTime(job, endsite, "MONGO_SAVE_ITEM", start));
 			} catch (Exception e) {
 //				e.printStackTrace();
 				Throwable rootException = ExceptionUtils.getRootCause(e);
 				if (rootException instanceof DuplicateKeyException) {
 					// Eat exception here else throw exception
-					LOGGER.warn("Eating Mongo DuplicateKeyException here in Extractor for Job:"+job.getId()+" endsite:{}, itemUrl:{}",endsite, itemVO.getEndsiteUrl());
+					LOGGER.warn(endsite+"."+job.getId()+".MONGO_DuplicateKeyException_EATING itemUrl:{}",
+							itemVO.getEndsiteUrl());
 				} else {
-					LOGGER.error("Mongo save exception for JobId:"+job.getId()+", Endsite:{}, itemUrl:{}",endsite, itemVO.getEndsiteUrl());
+					LOGGER.error(endsite+"."+job.getId()+".MONGO_SAVE_EXCEPTION itemUrl:{}",
+							itemVO.getEndsiteUrl(),e);
 				}
 
 			} // MongoDB save in ITEM collection

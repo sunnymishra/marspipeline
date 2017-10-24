@@ -29,7 +29,7 @@ public class WebDriverConfig {
 		System.setProperty("webdriver.chrome.driver",
 				applicationProps.getProperty("chrome.driver.path"));
 		options.addArguments("--headless", "--disable-gpu",
-				"--window-size=1920,1520"); // 1280,1696
+				"--window-size=1920,1520"); // 1280,1696	"--incognito",
 		WebDriver myntraDriver = new ChromeDriver(options);
 
 		Timeouts myntraTimeouts = myntraDriver.manage().timeouts();

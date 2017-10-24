@@ -51,6 +51,10 @@ public class ScraperService implements CommandLineRunner {
 	@Autowired
 	@Qualifier("amazonAgent")
 	private Agent amazonAgent;
+	
+	@Autowired
+	@Qualifier("flipkartAgent")
+	private Agent flipkartAgent;
 
 	@Autowired
 	private ItemRepository itemRepository;
@@ -83,7 +87,7 @@ public class ScraperService implements CommandLineRunner {
 //		startScraping(new Job("polka dots tshirt", new Date()));
 //		startScraping(new Job("polka dots top", new Date()));
 //		startScraping(new Job("jasmine top", new Date()));
-//		startScraping(new Job("denim jeans", new Date()));
+//		startScraping(new Job("jeans", new Date()));
 	}
 
 	public void startScraping(Job job) throws IOException, InterruptedException {
@@ -94,19 +98,19 @@ public class ScraperService implements CommandLineRunner {
 			job.setStatus(JobStatus.INPROGRESS.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			LOGGER.info(Util.logTime(localStart, "MONGO_UPDATE_JOB"));
+			LOGGER.info(Util.logTime(job, null, "MONGO_UPDATE_JOB", localStart));
 
 			localStart = System.currentTimeMillis();
 
 			callAgentIter(job);
 
-			LOGGER.info(Util.logTime(localStart, "JOB_SCRAPES_COMPLETION"));
+			LOGGER.info(Util.logTime(job, null,  "JOB_SCRAPES_COMPLETION", localStart));
 
 			localStart = System.currentTimeMillis();
 			job.setStatus(JobStatus.FINISHED.name());
 			job.setUpdatedDate(new Date());
 			jobRepository.save(job);
-			LOGGER.info(Util.logTime(localStart, "MONGO_UPDATE_SUCCESS_JOB"));
+			LOGGER.info(Util.logTime(job, null, "MONGO_UPDATE_SUCCESS_JOB",localStart));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -158,7 +162,7 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	private List<Callable<String>> getAgents() {
-		List<Callable<String>> agents = Arrays.asList(myntraAgent, amazonAgent);
+		List<Callable<String>> agents = Arrays.asList(myntraAgent, amazonAgent, flipkartAgent);
 		return agents;
 	}
 

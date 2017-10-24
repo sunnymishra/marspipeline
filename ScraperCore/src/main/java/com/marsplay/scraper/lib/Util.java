@@ -1,6 +1,5 @@
 package com.marsplay.scraper.lib;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -8,6 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.marsplay.repository.Job;
+import com.marsplay.scraper.lib.Constants.Endsites;
 
 public class Util {
 	private static final Logger LOGGER = LoggerFactory
@@ -47,10 +49,13 @@ public class Util {
 		String dte = dformat.format(date);
 		return dte;
 	 }
-	public static String logTime(long startTime, String work) {
+	public static String logTime(Job job, Endsites endsite, String work, long startTime) {
 		long localDuration = System.currentTimeMillis() - startTime;
-		return ">>>>>>>>Duration "+work+":" + ((int) (localDuration / 1000) % 60)
-				+ "s " + ((int) (localDuration % 1000)) + "m";
+		String duration=((int) (localDuration / 1000) % 60)	+ "s " + ((int) (localDuration % 1000)) + "m";
+		if(endsite!=null)
+			return ">>>DURATION."+endsite+"."+job.getId()+"."+work+":" + duration;
+		else
+			return ">>>DURATION."+job.getId()+"."+work+":" + duration;
 	}
 	public void sleep(int seconds) {
 		try {

@@ -13,7 +13,7 @@ public class Constants {
 	}
 	
 	public enum Endsites{
-		MYNTRA, AMAZON
+		MYNTRA, AMAZON, FLIPKART
 	}
 	public enum Currency{
 		INR

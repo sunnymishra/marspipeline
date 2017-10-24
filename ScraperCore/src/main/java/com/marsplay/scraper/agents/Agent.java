@@ -133,8 +133,8 @@ public abstract class Agent implements Callable<String> {
 		File screen = imgcapture.getScreenshotAs(OutputType.FILE);
 		String screenshotBasePath = applicationProps
 				.getProperty("scraper.screenshot.path");
-		String fpath = screenshotBasePath + File.separator + "page." + endsite
-				+ ".jobId." + jobId + ".png";
+		String fpath = screenshotBasePath + File.separator + "" + endsite
+				+ "." + jobId + ".png";
 		FileUtils.copyFile(screen, new File(fpath));
 		return fpath;
 	}
@@ -159,8 +159,8 @@ public abstract class Agent implements Callable<String> {
 
 		String screenshotBasePath = applicationProps
 				.getProperty("scraper.screenshot.path");
-		String path = screenshotBasePath + File.separator + "elem." + elemName
-				+ "." + endsite + ".jobId." + jobId + "." + Util.getTime()
+		String path = screenshotBasePath + File.separator + elemName
+				+ "." + endsite + "." + jobId + "." + Util.getTime()
 				+ ".png";
 		// Copy the element screenshot to disk
 		FileUtils.copyFile(screenshot, new File(path));

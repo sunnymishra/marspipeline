@@ -218,7 +218,7 @@ public class FlipkartAgent extends Agent {
 					LOGGER.error(endsite
 							+ "."
 							+ job.getId()
-							+ ".PRICE1_FORMATTING_EXCEPTION__IGNORING.",e);
+							+ ".PRICE1_FORMATTING_EXCEPTION__IGNORING.",e.getMessage());
 				}
 
 				validateScrapedHtml(job.getId(), itemVO); // This will log what
@@ -339,7 +339,7 @@ public class FlipkartAgent extends Agent {
 			NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
 			Number number = format.parse(priceTemp);
 			price1 = new BigDecimal(number.toString());
-		} catch (NumberFormatException | ParseException e) {
+		} catch (ParseException | IllegalArgumentException e) {
 			throw new IllegalArgumentException("Not able to parse price:\""
 					+ price + "\"", e);
 		}

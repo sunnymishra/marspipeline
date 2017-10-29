@@ -143,7 +143,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 						if(price!=null)
 							itemVO.setPrice(formatPrice(price.getText()));
 					} catch (IllegalArgumentException e) {
-						LOGGER.error(endsite + "." + job.getId()+ ".PRICE_FORMATTING_FAILED__IGNORING.{}",itemVO.getEndsiteUrl(), e);
+						LOGGER.error(endsite + "." + job.getId()+ ".PRICE_FORMATTING_FAILED__IGNORING.{}",itemVO.getEndsiteUrl(), e.getMessage());
 					}
 
 					WebElement image=null;
@@ -261,7 +261,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 		BigDecimal price1;
 		try {
 			price1 = new BigDecimal(priceTemp);
-		} catch (NumberFormatException e) {
+		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Not able to parse price:\""+price+"\"",e);
 		}
 		return price1;

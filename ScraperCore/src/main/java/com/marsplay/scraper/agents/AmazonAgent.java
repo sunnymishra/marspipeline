@@ -227,7 +227,7 @@ public class AmazonAgent extends Agent {
 				LOGGER.error(endsite
 						+ "."
 						+ job.getId()
-						+ ".PRICE1_FORMATTING_EXCEPTION__TRYING_PRICE2.",e);
+						+ ".PRICE1_FORMATTING_EXCEPTION__TRYING_PRICE2.",e.getMessage());
 						
 				price = Xsoup
 						.compile(
@@ -240,7 +240,7 @@ public class AmazonAgent extends Agent {
 					LOGGER.error(endsite
 							+ "."
 							+ job.getId()
-							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE2.",e1);
+							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE2.",e1.getMessage());
 					
 					price = Xsoup
 							.compile(
@@ -253,7 +253,7 @@ public class AmazonAgent extends Agent {
 						LOGGER.error(endsite
 								+ "."
 								+ job.getId()
-								+ ".PRICE3_FORMATTING_EXCEPTION__IGNOTING_PRICE.",e2);
+								+ ".PRICE3_FORMATTING_EXCEPTION__IGNOTING_PRICE.",e2.getMessage());
 					}
 				}
 			}
@@ -351,7 +351,7 @@ public class AmazonAgent extends Agent {
 			NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
 			Number number = format.parse(priceTemp);
 			price1 = new BigDecimal(number.toString());
-		} catch (NumberFormatException | ParseException e) {
+		} catch (IllegalArgumentException | ParseException e) {
 			throw new IllegalArgumentException("Not able to parse price:\""
 					+ price + "\"", e);
 		}

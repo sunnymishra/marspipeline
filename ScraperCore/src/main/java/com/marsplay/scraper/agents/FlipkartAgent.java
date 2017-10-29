@@ -1,11 +1,8 @@
 package com.marsplay.scraper.agents;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Date;
@@ -34,7 +31,7 @@ import org.springframework.stereotype.Service;
 
 import us.codecraft.xsoup.Xsoup;
 
-import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.JsonPath;
 import com.marsplay.repository.Item;
 import com.marsplay.repository.ItemRepository;
@@ -87,7 +84,10 @@ public class FlipkartAgent extends Agent {
 		return document;
 
 	}
-
+/*	public static void main(String[] args) throws Exception {
+		FlipkartAgent agent = new FlipkartAgent();
+		agent.scrapeAction(new Job("jeans", new Date()));
+	}*/
 	@Override
 	public void scrapeAction(Job job) throws Exception {
 		LOGGER.info("Scraping {} for Job '{}'", endsite, job);
@@ -95,7 +95,8 @@ public class FlipkartAgent extends Agent {
 		Document document = (Document) launchEndsite(job);
 
 		Elements scripts = document.select("script"); // Get the script part
-		Object json = null;
+//		Object json = null;
+		DocumentContext json = null;
 		for (Element script : scripts) {
 			// Regex for the value of the key
 			Pattern p = Pattern.compile(businessProps
@@ -105,14 +106,13 @@ public class FlipkartAgent extends Agent {
 
 			if (m.find()) {
 				String jsonString = m.group(2);
-				json = Configuration.defaultConfiguration().jsonProvider()
-						.parse(jsonString);
+//				json = Configuration.defaultConfiguration().jsonProvider()
+//						.parse(jsonString);
+				json = JsonPath.parse(jsonString);
 			}
 		}
 		if (json == null)
-			LOGGER.error("Endsite:" + endsite.name()
-					+ " Price Exception JobId: {} Exception:{}", job.getId(),
-					"No JSON script tag found.");
+			LOGGER.error(endsite+"."+job.getId()+".JSON_SCRIPT_TAG_MISSING__IGNORING");
 		Elements itemContainer = Xsoup
 				.compile(businessProps.getProperty("flipkart.xpath.container"))
 				.evaluate(document).getElements();
@@ -147,7 +147,7 @@ public class FlipkartAgent extends Agent {
 			for (Element item : items) {
 				Item itemVO = new Item();
 				itemVO.setJob(job);
-				itemVO.setEndSite(endsite.name());
+				itemVO.setEndsite(endsite.name());
 
 				String baseUrl = businessProps
 						.getProperty("flipkart.endsite.baseurl");
@@ -191,14 +191,16 @@ public class FlipkartAgent extends Agent {
 
 				String pId = null;
 
-				Optional<NameValuePair> pair = getUrlPid(uri);
+				Optional<NameValuePair> pair = getUrlId(uri, businessProps.getProperty("flipkart.item.json.idkey"));
 
 				if (pair.isPresent()) {
 					pId = pair.get().getValue();
-					String baseUrlPath = businessProps
+					String imageUrlPath = businessProps
 							.getProperty("flipkart.relative.xpath.image1");
-					baseUrlPath = baseUrlPath.replace("_PID_", pId);
-					String imageUrl = JsonPath.read(json, baseUrlPath);
+					imageUrlPath = imageUrlPath.replace("_PID_", pId);
+					
+					String imageUrl = json.read(imageUrlPath);
+//					String imageUrl = JsonPath.read(json, imageUrlPath);
 					itemVO.setEndsiteImageUrl(formatImageUrl(imageUrl));
 				} else
 					LOGGER.error("Endsite:" + endsite.name()
@@ -213,9 +215,10 @@ public class FlipkartAgent extends Agent {
 				try {
 					itemVO.setPrice(formatPrice(price.text()));
 				} catch (IllegalArgumentException e) {
-					LOGGER.error("Price1 Exception for JobId:" + job.getId()
-							+ " itemUrl:\"" + itemVO.getEndsiteUrl() + "\"::"
-							+ e.getMessage());
+					LOGGER.error(endsite
+							+ "."
+							+ job.getId()
+							+ ".PRICE1_FORMATTING_EXCEPTION__IGNORING.",e);
 				}
 
 				validateScrapedHtml(job.getId(), itemVO); // This will log what
@@ -281,11 +284,11 @@ public class FlipkartAgent extends Agent {
 		}
 	}
 
-	private Optional<NameValuePair> getUrlPid(String url)
+	private Optional<NameValuePair> getUrlId(String url, String key)
 			throws UnsupportedEncodingException, URISyntaxException {
 		List<NameValuePair> queryParams = new URIBuilder(url).getQueryParams();
 		Optional<NameValuePair> valuePair = queryParams.stream()
-				.filter(pair -> pair.getName().equals("pid")).findFirst();
+				.filter(pair -> pair.getName().equals(key)).findFirst();
 		return valuePair;
 	}
 

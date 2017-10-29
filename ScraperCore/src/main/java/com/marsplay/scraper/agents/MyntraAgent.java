@@ -86,35 +86,43 @@ public class MyntraAgent extends Agent implements Callable<String>{
 			// ItemVO itemVO = new ItemVO(Endsites.MYNTRA);
 			Item itemVO = new Item();
 			itemVO.setJob(job);
-			itemVO.setEndSite(Endsites.MYNTRA.name());
+			itemVO.setEndsite(Endsites.MYNTRA.name());
 			++counter;
 //			getElementScreenshot(item, "item"+counter, job.getId());
 			// item.sendKeys( Keys.DOWN ); //simulate visual movement
 			boolean isElementLoaded = false;
 			while (!isElementLoaded) {
 				try {
-					WebElement url = waitAndExtractElement(
-							item,
-							ElementType.XPATH,
-							businessProps
-									.getProperty("myntra.relative.xpath.url1"));
-					String endsiteUrl = url.getAttribute("href");
-					if(StringUtil.isBlank(endsiteUrl)){
-						LOGGER.error("endsiteUrl not found. Skipping jobId:{} for Endsite:{}", job.getId(), endsite);
-						break;
+					try {
+						WebElement url = waitAndExtractElement(
+								item,
+								ElementType.XPATH,
+								businessProps
+										.getProperty("myntra.relative.xpath.url1"));
+						String endsiteUrl = url.getAttribute("href");
+						if(StringUtil.isBlank(endsiteUrl)){
+							LOGGER.error("endsiteUrl not found. Skipping jobId:{} for Endsite:{}", job.getId(), endsite);
+							break;
+						}
+						itemVO.setEndsiteUrl(endsiteUrl);
+					} catch (org.openqa.selenium.NoSuchElementException e) {
+//						getElementScreenshot(item, "brand"+counter, job.getId());
+						LOGGER.error(endsite+".{}.ENDSITE_URL_NOT_FOUND__SKIPPING_ITEM",job.getId());
 					}
-					itemVO.setEndsiteUrl(url.getAttribute("href"));
-					WebElement brand = item.findElement(By.xpath(businessProps
-							.getProperty("myntra.relative.xpath.brand")));
-					itemVO.setBrand(brand.getText());
-//					getElementScreenshot(item, "brand"+counter, job.getId());
-					// WebElement element =
-					// webDriverWait.until(ExpectedConditions.elementToBeClickable(By.id("periodicElement")));
-					WebElement name = item.findElement(By.xpath(businessProps
-							.getProperty("myntra.relative.xpath.name")));
-					itemVO.setName(name.getText());
-//					getElementScreenshot(item, "name"+counter, job.getId());
-//					LOGGER.info(itemVO.toString());
+					try {
+						WebElement brand = item.findElement(By.xpath(businessProps
+								.getProperty("myntra.relative.xpath.brand")));
+						itemVO.setBrand(brand.getText());
+					}catch (org.openqa.selenium.NoSuchElementException e) {
+						LOGGER.error(endsite+".{}.BRAND_NOT_FOUND__IGNORING.{}",job.getId(),itemVO.getEndsiteUrl());
+					}
+					try {
+						WebElement name = item.findElement(By.xpath(businessProps
+								.getProperty("myntra.relative.xpath.name")));
+						itemVO.setName(name.getText());
+					}catch (org.openqa.selenium.NoSuchElementException e) {
+						LOGGER.error(endsite+".{}.NAME_NOT_FOUND__IGNORING.{}",job.getId(),itemVO.getEndsiteUrl());
+					}
 
 					WebElement price = null;
 					try {
@@ -122,23 +130,23 @@ public class MyntraAgent extends Agent implements Callable<String>{
 								.getProperty("myntra.relative.xpath.price1")));
 //						getElementScreenshot(item, "priceA"+counter, job.getId());
 					} catch (org.openqa.selenium.NoSuchElementException e) {
-						LOGGER.warn("Price1 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:{}", itemVO.getEndsiteUrl(), e.getMessage());
+						LOGGER.warn(endsite + "." + job.getId()	+ ".PRICE1_NOT_FOUND__TRYING_PRICE2.{}",itemVO.getEndsiteUrl());
 						try {
 							price = item.findElement(By.xpath(businessProps
 									.getProperty("myntra.relative.xpath.price2")));
 						} catch (org.openqa.selenium.NoSuchElementException e1) {
-							LOGGER.error("Price2 Exception for JobId:"+job.getId()+" Endsite:"+endsite + " endsiteUrl:{}", itemVO.getEndsiteUrl(), e1.getMessage());
+							LOGGER.error(endsite + "." + job.getId()+ ".PRICE1_NOT_FOUND__IGNORING.{}",itemVO.getEndsiteUrl());
 						}
 //						getElementScreenshot(item, "priceB"+counter, job.getId());
 					}
 					try {
-						itemVO.setPrice(formatPrice(price.getText()));
+						if(price!=null)
+							itemVO.setPrice(formatPrice(price.getText()));
 					} catch (IllegalArgumentException e) {
-						// TODO Log this error for Flagging Scraping error
-						e.printStackTrace();
+						LOGGER.error(endsite + "." + job.getId()+ ".PRICE_FORMATTING_FAILED__IGNORING.{}",itemVO.getEndsiteUrl(), e);
 					}
 
-					WebElement image;
+					WebElement image=null;
 					try {
 						// Image load may take time, therefore using Selenium
 						// FluentWait API below
@@ -148,19 +156,23 @@ public class MyntraAgent extends Agent implements Callable<String>{
 								businessProps
 										.getProperty("myntra.relative.xpath.image1"));
 					} catch (org.openqa.selenium.NoSuchElementException e) {
-						image = waitAndExtractElement(
-								item,
-								ElementType.XPATH,
-								businessProps
-										.getProperty("myntra.relative.xpath.image2"));
+						LOGGER.warn(endsite+".{}.IMAGE1_NOT_FOUND__TRYING_IMAGE2.{}",job.getId(),itemVO.getEndsiteUrl());
+						try {
+							image = waitAndExtractElement(
+									item,
+									ElementType.XPATH,
+									businessProps
+											.getProperty("myntra.relative.xpath.image2"));
+						} catch (org.openqa.selenium.NoSuchElementException e1) {
+							LOGGER.error(endsite + "." + job.getId()+ ".IMAGE2_NOT_FOUND__IGNORING.{}",itemVO.getEndsiteUrl());
+						}
 					}
 					itemVO.setEndsiteImageUrl(image.getAttribute("src"));
 
 					isElementLoaded = true;
 				} catch (org.openqa.selenium.NoSuchElementException e) {
-					LOGGER.error(
-							"Failed to find element for JobId="+job.getId()+", Endsite={}, ErrorMessage={}",
-							endsite, e.getMessage());
+					LOGGER.error(endsite+"."+job.getId()+".ELEMENT_NOT_FOUND__SLEEPING_RETRYING.{}",itemVO.getEndsiteUrl()
+							, e.getMessage());
 					Thread.sleep(1000);
 					// TODO If this Exception times out, then Log this error for
 					// Flagging Scraping error
@@ -168,9 +180,7 @@ public class MyntraAgent extends Agent implements Callable<String>{
 					retry++;
 					if (retry >= Integer.parseInt(businessProps
 							.getProperty("common.element_fetch_retry_max"))) {
-						LOGGER.error(
-								"We maxed out retries to find element for JobId="+job.getId()+", Endsite={}. ErrorMessage={}. Throwing exception now.",
-								endsite, e.getMessage());
+						LOGGER.error(endsite+"."+job.getId()+".MAXED_OUT_RETRIES_ELEMENT_NOT_FOUND__THROWING_EXEPTION.{}",itemVO.getEndsiteUrl());
 						throw e;
 					}
 				}

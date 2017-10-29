@@ -22,6 +22,7 @@ App can fetch everything else in 1st call and then later fetch image.
 - Build an analytics tool to analyse and report errors and job durations and drill downs
 - Add status for individual Endsites in DB
 - If CancellationException happens in Callable class, the Thread continues to run even after future.get() is invoked. This needs to be stopped
+- Agents should not call business.properties props with agent's name hardcoded. eg. koovs.relative.json.price1
 
 Endsites: Myntra, Amazon, Flipkart, Nykaa, Koovs (new) 
 

@@ -46,6 +46,10 @@ public class AmazonAgent extends Agent {
 		// PageFactory.initElements(driver, this);
 	}
 
+	// public static void main(String[] args) throws Exception {
+	// AmazonAgent agent = new AmazonAgent();
+	// agent.scrapeAction(new Job("polka dots dress", new Date()));
+	// }
 	@Override
 	public Object launchEndsite(Job job) throws Exception {
 		String endsiteBaseUrl = businessProps
@@ -115,7 +119,7 @@ public class AmazonAgent extends Agent {
 		for (Element item : itemContainer1) {
 			Item itemVO = new Item();
 			itemVO.setJob(job);
-			itemVO.setEndSite(endsite.name());
+			itemVO.setEndsite(endsite.name());
 
 			Elements sponsoredElem1 = Xsoup
 					.compile(
@@ -218,22 +222,39 @@ public class AmazonAgent extends Agent {
 									.getProperty("amazon.relative.xpath.price1"))
 					.evaluate(item).getElements();
 			try {
-				itemVO.setPrice(formatPrice(price.text()));
+				itemVO.setPrice(formatPrice(price.text(), true));
 			} catch (IllegalArgumentException e) {
-				LOGGER.error("Price1 Exception for JobId:" + job.getId()
-						+ " itemUrl:\"" + itemVO.getEndsiteUrl() + "\"::"
-						+ e.getMessage());
+				LOGGER.error(endsite
+						+ "."
+						+ job.getId()
+						+ ".PRICE1_FORMATTING_EXCEPTION__TRYING_PRICE2.",e);
+						
 				price = Xsoup
 						.compile(
 								businessProps
 										.getProperty("amazon.relative.xpath.price2"))
 						.evaluate(item).getElements();
 				try {
-					itemVO.setPrice(formatPrice(price.text()));
+					itemVO.setPrice(formatPrice(price.text(), true));
 				} catch (IllegalArgumentException e1) {
-					LOGGER.error("Price2 Exception for JobId:" + job.getId()
-							+ " itemUrl:\"" + itemVO.getEndsiteUrl() + "\"::",
-							e1.getMessage());
+					LOGGER.error(endsite
+							+ "."
+							+ job.getId()
+							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE2.",e1);
+					
+					price = Xsoup
+							.compile(
+									businessProps
+											.getProperty("amazon.relative.xpath.price3"))
+							.evaluate(item).getElements();
+					try {
+						itemVO.setPrice(formatPrice(price.text(), false));
+					} catch (IllegalArgumentException e2) {
+						LOGGER.error(endsite
+								+ "."
+								+ job.getId()
+								+ ".PRICE3_FORMATTING_EXCEPTION__IGNOTING_PRICE.",e2);
+					}
 				}
 			}
 
@@ -266,6 +287,8 @@ public class AmazonAgent extends Agent {
 			try {
 				start = System.currentTimeMillis();
 				itemRepository.save(itemVO);
+//				System.out.println(itemVO);
+				
 				LOGGER.info(Util
 						.logTime(job, endsite, "MONGO_SAVE_ITEM", start));
 			} catch (Exception e) {
@@ -308,20 +331,22 @@ public class AmazonAgent extends Agent {
 	 * @return double
 	 * @throws
 	 */
-	public BigDecimal formatPrice(String price) {
+	public BigDecimal formatPrice(String price, boolean isFormattingRequired) {
 		String priceTemp = price;
 		if (priceTemp == null)
 			throw new IllegalArgumentException("Price cannot be null");
 		priceTemp = priceTemp.trim();
 		if (priceTemp.isEmpty())
 			throw new IllegalArgumentException("Price cannot be empty");
-		String extraText = businessProps.getProperty("amazon.price.extratext");
-		if (priceTemp.contains(extraText)) {
-			priceTemp = priceTemp.substring(0, priceTemp.indexOf(extraText));
+		if(isFormattingRequired){
+			String extraText = businessProps.getProperty("amazon.price.extratext");
+			if (priceTemp.contains(extraText)) {
+				priceTemp = priceTemp.substring(0, priceTemp.indexOf(extraText));
+			}
+			priceTemp = priceTemp.replaceAll("\u00A0", "");
 		}
-		BigDecimal price1;
+		BigDecimal price1=null;
 		priceTemp = priceTemp.trim();
-		priceTemp = priceTemp.replaceAll("\u00A0", "");
 		try {
 			NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
 			Number number = format.parse(priceTemp);

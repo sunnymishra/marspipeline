@@ -27,7 +27,7 @@ public class Item {
     
     private String name;
     private String brand;
-    private String endSite;
+    private String endsite;
     private String endsiteImageUrl;
     private String cdnImageUrl;
     private String cdnImageId;
@@ -47,7 +47,7 @@ public class Item {
 		this.job = job;
 		this.name = name;
 		this.brand = brand;
-		this.endSite = endSite;
+		this.endsite = endSite;
 		this.endsiteImageUrl = endsiteImageUrl;
 		this.cdnImageUrl = cdnImageUrl;
 		this.cdnImageId = cdnImageId;
@@ -92,12 +92,12 @@ public class Item {
 		this.cdnImageUrl = cdnImageUrl;
 	}
 
-	public String getEndSite() {
-		return endSite;
+	public String getEndsite() {
+		return endsite;
 	}
 
-	public void setEndSite(String endSite) {
-		this.endSite = endSite;
+	public void setEndsite(String endsite) {
+		this.endsite = endsite;
 	}
 
 	public BigDecimal getPrice() {
@@ -143,8 +143,8 @@ public class Item {
 	@Override
 	public String toString() {
 		return "Item [id=" + id + ", endsiteUrl=" + endsiteUrl 
-				+ ", name=" + name + ", brand=" + brand + ", endSite="
-				+ endSite + ", endsiteImageUrl=" + endsiteImageUrl
+				+ ", name=" + name + ", brand=" + brand + ", endsite="
+				+ endsite + ", endsiteImageUrl=" + endsiteImageUrl
 				+ ", cdnImageUrl=" + cdnImageUrl + ", cdnImageId=" + cdnImageId
 				+ ", price=" + price + ", createdDate=" + createdDate 
 				+ ", job=" + job + "]";

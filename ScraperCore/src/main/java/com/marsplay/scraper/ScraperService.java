@@ -1,6 +1,7 @@
 package com.marsplay.scraper;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
 
+import org.apache.commons.lang.StringUtils;
 import org.openqa.selenium.WebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ import com.marsplay.repository.lib.Constants.JobStatus;
 import com.marsplay.scraper.agents.Agent;
 import com.marsplay.scraper.lib.CloudinarySingleton;
 import com.marsplay.scraper.lib.Constants;
+import com.marsplay.scraper.lib.Constants.Endsites;
 import com.marsplay.scraper.lib.ExecutorServiceExt;
 import com.marsplay.scraper.lib.Util;
 
@@ -43,28 +46,15 @@ public class ScraperService implements CommandLineRunner {
 
 	Properties businessProps;
 	Properties applicationProps;
-
-	@Autowired
-	@Qualifier("myntraAgent")
-	private Agent myntraAgent;
-
-	@Autowired
-	@Qualifier("amazonAgent")
-	private Agent amazonAgent;
 	
-	@Autowired
-	@Qualifier("flipkartAgent")
-	private Agent flipkartAgent;
-
 	@Autowired
 	private ItemRepository itemRepository;
 	@Autowired
 	private JobRepository jobRepository;
-
+	@Autowired
+	private List<Callable<String>> agents;
+	
 	private ExecutorService executor = null;
-
-	// @Value("${selenium.server.url}")
-	// private String seleniumServerUrl;
 
 	@Override
 	public void run(String... arg0) throws Exception {
@@ -73,17 +63,19 @@ public class ScraperService implements CommandLineRunner {
 		applicationProps = Constants.getApplicationProps();
 		String cloudinaryUrl = applicationProps
 				.getProperty("cloudinary.connection.url");
-		// TODO: Cloudinary URL value should come from System variables set in
-		// startupscript
+		// TODO: Cloudinary URL value should come from System variables
+		//  set in startupscript
 		if (cloudinaryUrl != null && cloudinaryUrl != "")
 			CloudinarySingleton
 					.registerCloudinary(new Cloudinary(cloudinaryUrl));
-
-		executor = new ExecutorServiceExt(Executors.newFixedThreadPool(3));
+		
+		int threadSize=agents.size();
+		LOGGER.info("Thread size:{}",threadSize);
+		executor = new ExecutorServiceExt(Executors.newFixedThreadPool(threadSize));
 
 //		startScraping(new Job("sunglasses", new Date()));
-//		startScraping(new Job("polka dots dress", new Date()));
-//		startScraping(new Job("polka dots shirt", new Date()));
+		startScraping(new Job("polka dots dress", new Date()));
+		startScraping(new Job("polka dots shirt", new Date()));
 //		startScraping(new Job("polka dots tshirt", new Date()));
 //		startScraping(new Job("polka dots top", new Date()));
 //		startScraping(new Job("jasmine top", new Date()));
@@ -120,8 +112,6 @@ public class ScraperService implements CommandLineRunner {
 	}
 
 	public void callAgentIter(Job job) throws InterruptedException {
-		List<Callable<String>> agents = getAgents();
-		
 		agents.stream().forEach(agent -> {
 			((Agent) agent).setJob(job);
 		});
@@ -161,10 +151,7 @@ public class ScraperService implements CommandLineRunner {
 				});
 	}
 
-	private List<Callable<String>> getAgents() {
-		List<Callable<String>> agents = Arrays.asList(myntraAgent, amazonAgent, flipkartAgent);
-		return agents;
-	}
+	
 
 	@PreDestroy
 	public void cleanUp() throws Exception {

@@ -240,7 +240,7 @@ public class AmazonAgent extends Agent {
 					LOGGER.error(endsite
 							+ "."
 							+ job.getId()
-							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE2.",e1.getMessage());
+							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE3.",e1.getMessage());
 					
 					price = Xsoup
 							.compile(
@@ -253,7 +253,7 @@ public class AmazonAgent extends Agent {
 						LOGGER.error(endsite
 								+ "."
 								+ job.getId()
-								+ ".PRICE3_FORMATTING_EXCEPTION__IGNOTING_PRICE.",e2.getMessage());
+								+ ".PRICE3_FORMATTING_EXCEPTION__IGNORING_PRICE.",e2.getMessage());
 					}
 				}
 			}

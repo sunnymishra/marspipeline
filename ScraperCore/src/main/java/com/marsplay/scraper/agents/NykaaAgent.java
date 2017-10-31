@@ -31,55 +31,46 @@ import com.marsplay.scraper.lib.Constants.Endsites;
 import com.marsplay.scraper.lib.Util;
 import com.mongodb.DuplicateKeyException;
 
-@Service("amazonAgent")
-public class AmazonAgent extends Agent {
+@Service("nykaaAgent")
+public class NykaaAgent extends Agent {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(ScraperService.class);
 	@Autowired
 	private ItemRepository itemRepository;
 
-	public AmazonAgent() {
+	public NykaaAgent() {
 		super();
-		LOGGER.info("Constructor AmazonAgent()");
+		LOGGER.info("Constructor NykaaAgent()");
 		// this.itemRepository = itemRepository;
-		this.endsite = Endsites.AMAZON;
+		this.endsite = Endsites.NYKAA;
 		// PageFactory.initElements(driver, this);
 	}
 
-	// public static void main(String[] args) throws Exception {
-	// AmazonAgent agent = new AmazonAgent();
-	// agent.scrapeAction(new Job("polka dots dress", new Date()));
-	// }
+	 public static void main(String[] args) throws Exception {
+		 NykaaAgent agent = new NykaaAgent();
+		 agent.scrapeAction(new Job("lipstick", new Date()));
+	 }
 	@Override
 	public Object launchEndsite(Job job) throws Exception {
-		String endsiteBaseUrl = businessProps
-				.getProperty("amazon.endsite.searchurl");
-		String endsiteUrl = endsiteBaseUrl + job.getMessage();
-		/*
-		 * byte[] fileBytes = Files.readAllBytes(Paths.get("D:/amazon.html"));
-		 * String htmlStr = new String(fileBytes); Document document =
-		 * Jsoup.parse(htmlStr);
-		 */
+		String endsiteBaseSearchUrl = businessProps
+				.getProperty("nykaa.endsite.searchurl");
+		String endsiteSearchUrl = endsiteBaseSearchUrl + job.getMessage();
 		long start = System.currentTimeMillis();
 		int pageLoadTimeout = (int) TimeUnit.SECONDS.toMillis(Long
 				.parseLong(businessProps
 						.getProperty("common.page_load_timeout_seconds")));
-		// Document document = Jsoup.connect(endsiteUrl)
-		// .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
-		// .timeout(pageLoadTimeout)
-		// .get();
 		Connection con = Jsoup
-				.connect(endsiteUrl)
+				.connect(endsiteSearchUrl)
 				.userAgent(
 						"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/535.21 (KHTML, like Gecko) Chrome/19.0.1042.0 Safari/535.21")
 				.timeout(pageLoadTimeout);
 		Connection.Response resp = con.execute();
 		if (resp.statusCode() != 200)
 			throw new HttpStatusException("Couldn't fetch Endsite url",
-					resp.statusCode(), endsiteUrl);
+					resp.statusCode(), endsiteSearchUrl);
 		Document document = con.get();
 
-		LOGGER.info(Util.logTime(job, endsite, "ENDITE_AMAZON_OPEN", start));
+		LOGGER.info(Util.logTime(job, endsite, "ENDITE_NYKAA_OPEN", start));
 		return document;
 
 	}
@@ -95,15 +86,19 @@ public class AmazonAgent extends Agent {
 		LOGGER.info(Util.logTime(job, endsite, "SAVE_HTML", start));
 
 		Elements itemContainer = Xsoup
-				.compile(businessProps.getProperty("amazon.xpath.container"))
+				.compile(businessProps.getProperty("nykaa.xpath.container"))
 				.evaluate(document).getElements();
 		if (itemContainer.isEmpty()) {
 			LOGGER.error(endsite + "." + job.getId()
 					+ ".PARSING_FAILURE_EMPTY_CONTAINER");
 			return;
 		}
-		Elements itemContainer1 = itemContainer.select(businessProps
-				.getProperty("amazon.xpath.item"));
+		Elements itemContainer1 = Xsoup
+				.compile(businessProps.getProperty("nykaa.xpath.item"))
+				.evaluate(itemContainer.first()).getElements();
+		
+//		Elements itemContainer1 = itemContainer.select(businessProps
+//				.getProperty("nykaa.xpath.item"));
 		if (itemContainer1.isEmpty()) {
 			LOGGER.error(endsite + "." + job.getId()
 					+ ".PARSING_FAILURE_EMPTY_SUB_CONTAINER");
@@ -121,51 +116,30 @@ public class AmazonAgent extends Agent {
 			itemVO.setJob(job);
 			itemVO.setEndsite(endsite.name());
 
-			Elements sponsoredElem1 = Xsoup
-					.compile(
-							businessProps
-									.getProperty("amazon.relative.xpath.sponsoreditem"))
-					.evaluate(item).getElements();
-			if (!sponsoredElem1.isEmpty()) {
-				LOGGER.warn(endsite + "." + job.getId()
-						+ ".FOUND_SPONSORED_ELEMENT__SKIPPING");
-				continue;
-			}
-
 			Elements urlElem = Xsoup
 					.compile(
 							businessProps
-									.getProperty("amazon.relative.xpath.url1"))
+									.getProperty("nykaa.relative.xpath.url1"))
 					.evaluate(item).getElements();
 			if (urlElem.isEmpty()) {
-				LOGGER.warn(endsite + "." + job.getId()
-						+ ".NOT_FOUND_ENDSITE_URL1__TRYING_URL2");
-
-				urlElem = Xsoup
-						.compile(
-								businessProps
-										.getProperty("amazon.relative.xpath.url2"))
-						.evaluate(item).getElements();
-				if (urlElem.isEmpty()) {
-					LOGGER.error(endsite + "." + job.getId()
-							+ ".NOT_FOUND_ENDSITE_URL2__SKIPPING_ITEM");
-					exceptionSkippingCounter++;
-					if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
-						LOGGER.error(endsite
-								+ "."
-								+ job.getId()
-								+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
-						break;
-					} else
-						continue;
-				}
+				LOGGER.error(endsite + "." + job.getId()
+						+ ".NOT_FOUND_ENDSITE_URL1__SKIPPING_ITEM");
+				exceptionSkippingCounter++;
+				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
+					LOGGER.error(endsite
+							+ "."
+							+ job.getId()
+							+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
+					break;
+				} else
+					continue;
 			}
-			itemVO.setEndsiteUrl(urlElem.attr("href"));
+			itemVO.setEndsiteUrl(businessProps.getProperty("nykaa.endsite.baseurl")+urlElem.attr("href"));
 
 			++counter;
 
 			String brandPath = businessProps
-					.getProperty("amazon.relative.xpath.brand");
+					.getProperty("nykaa.relative.xpath.brand");
 			String brand = "";
 			if (!StringUtil.isBlank(brandPath)) {
 				Elements brandElem = Xsoup.compile(brandPath).evaluate(item)
@@ -177,49 +151,38 @@ public class AmazonAgent extends Agent {
 			Elements name = Xsoup
 					.compile(
 							businessProps
-									.getProperty("amazon.relative.xpath.name"))
+									.getProperty("nykaa.relative.xpath.name"))
 					.evaluate(item).getElements();
 			itemVO.setName(name.text());
 			Elements image = Xsoup
 					.compile(
 							businessProps
-									.getProperty("amazon.relative.xpath.image1"))
+									.getProperty("nykaa.relative.xpath.image1"))
 					.evaluate(item).getElements();
 			if (image.isEmpty()) {
 				LOGGER.warn(
 						endsite
 								+ "."
 								+ job.getId()
-								+ ".NOT_FOUND_IMAGE_URL1__TRYING_IMAGE_URL2.endsiteUrl:{}",
+								+ ".NOT_FOUND_IMAGE1__MAY_IGNORE.endsiteUrl:{}",
 						itemVO.getEndsiteUrl());
-				image = Xsoup
-						.compile(
-								businessProps
-										.getProperty("amazon.relative.xpath.image2"))
-						.evaluate(item).getElements();
-				if (image.isEmpty()) {
-					LOGGER.warn(
-							endsite
-									+ "."
-									+ job.getId()
-									+ ".NOT_FOUND_IMAGE_URL2__MAY_IGNORE.endsiteUrl:{}",
-							itemVO.getEndsiteUrl());
-					exceptionSkippingCounter++;
-					if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
-						LOGGER.error(endsite
-								+ "."
-								+ job.getId()
-								+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
-						break;
-					}
+				exceptionSkippingCounter++;
+				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
+					LOGGER.error(endsite
+							+ "."
+							+ job.getId()
+							+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
+					break;
 				}
-
 			}
-			itemVO.setEndsiteImageUrl(image.attr("src"));
+
+			if (!image.isEmpty()) {
+				itemVO.setEndsiteImageUrl(image.attr("src"));
+			}
 			Elements price = Xsoup
 					.compile(
 							businessProps
-									.getProperty("amazon.relative.xpath.price1"))
+									.getProperty("nykaa.relative.xpath.price1"))
 					.evaluate(item).getElements();
 			try {
 				itemVO.setPrice(formatPrice(price.text(), true));
@@ -227,40 +190,20 @@ public class AmazonAgent extends Agent {
 				LOGGER.error(endsite
 						+ "."
 						+ job.getId()
-						+ ".PRICE1_FORMATTING_EXCEPTION__TRYING_PRICE2.{}",e.getMessage());
-						
-				price = Xsoup
-						.compile(
-								businessProps
-										.getProperty("amazon.relative.xpath.price2"))
-						.evaluate(item).getElements();
-				try {
-					itemVO.setPrice(formatPrice(price.text(), true));
-				} catch (IllegalArgumentException e1) {
+						+ ".PRICE1_FORMATTING_EXCEPTION__MAY_IGNORE.{}",e.getMessage());
+				exceptionSkippingCounter++;
+				if (exceptionSkippingCounter >= exceptionSkippingMaxCount) {
 					LOGGER.error(endsite
 							+ "."
 							+ job.getId()
-							+ ".PRICE2_FORMATTING_EXCEPTION__TRYING_PRICE3.{}",e1.getMessage());
-					
-					price = Xsoup
-							.compile(
-									businessProps
-											.getProperty("amazon.relative.xpath.price3"))
-							.evaluate(item).getElements();
-					try {
-						itemVO.setPrice(formatPrice(price.text(), false));
-					} catch (IllegalArgumentException e2) {
-						LOGGER.error(endsite
-								+ "."
-								+ job.getId()
-								+ ".PRICE3_FORMATTING_EXCEPTION__IGNORING_PRICE.{}",e2.getMessage());
-					}
+							+ ".EXCEPTION_SKIPPING_COUNTER_EXCEEDED__BREAKINGLOOP");
+					break;
 				}
 			}
 
-			validateScrapedHtml(job.getId(), itemVO); // This will log what
-														// itemVO attributes
-														// were not found
+			// This will log not found itemVO attributes
+			validateScrapedHtml(job.getId(), itemVO);
+			
 			try {
 				start = System.currentTimeMillis();
 				Map<String, Object> responseMap = uploadFile(itemVO
@@ -279,7 +222,7 @@ public class AmazonAgent extends Agent {
 							endsite
 									+ "."
 									+ job.getId()
-									+ ".CLOUDINARY_UPLOAD_EXCEPTION__SKIPPING_ITEM. itemUrl:{}",
+									+ ".CLOUDINARY_UPLOAD_EXCEPTION__SKIPPING_ITEM.endsiteUrl:{}",
 							itemVO.getEndsiteUrl());
 					break;
 				}
@@ -339,12 +282,10 @@ public class AmazonAgent extends Agent {
 		if (priceTemp.isEmpty())
 			throw new IllegalArgumentException("Price cannot be empty");
 		if(isFormattingRequired){
-			String extraText = businessProps.getProperty("amazon.price.extratext");
+			String extraText = businessProps.getProperty("nykaa.price.extratext");
 			if (priceTemp.contains(extraText)) {
 				priceTemp = priceTemp.replace(extraText,"");
-//				priceTemp = priceTemp.substring(0, priceTemp.indexOf(extraText));
 			}
-			priceTemp = priceTemp.replaceAll("\u00A0", "");
 		}
 		BigDecimal price1=null;
 		priceTemp = priceTemp.trim();

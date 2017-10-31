@@ -74,7 +74,7 @@ public class ScraperService implements CommandLineRunner {
 		executor = new ExecutorServiceExt(Executors.newFixedThreadPool(threadSize));
 
 //		startScraping(new Job("sunglasses", new Date()));
-//		startScraping(new Job("polka dots dress", new Date()));
+//		startScraping(new Job("lipstick", new Date()));
 //		startScraping(new Job("polka dots shirt", new Date()));
 //		startScraping(new Job("polka dots tshirt", new Date()));
 //		startScraping(new Job("polka dots top", new Date()));

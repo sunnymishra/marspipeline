@@ -79,7 +79,7 @@ public class FlipkartAgent extends Agent {
 
 		start = System.currentTimeMillis();
 		saveScrapedHtml(document, job.getId()); // Saving Scraped Html
-		LOGGER.info(Util.logTime(job, endsite, "SAVE_FLIPKART_HTML", start));
+		LOGGER.info(Util.logTime(job, endsite, "SAVE_HTML", start));
 
 		return document;
 
@@ -218,7 +218,7 @@ public class FlipkartAgent extends Agent {
 					LOGGER.error(endsite
 							+ "."
 							+ job.getId()
-							+ ".PRICE1_FORMATTING_EXCEPTION__IGNORING.",e.getMessage());
+							+ ".PRICE1_FORMATTING_EXCEPTION__IGNORING.{}",e.getMessage());
 				}
 
 				validateScrapedHtml(job.getId(), itemVO); // This will log what

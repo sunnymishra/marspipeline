@@ -24,6 +24,7 @@ App can fetch everything else in 1st call and then later fetch image.
 - If CancellationException happens in Callable class, the Thread continues to run even after future.get() is invoked. This needs to be stopped
 - Agents should not call business.properties props with agent's name hardcoded. eg. koovs.relative.json.price1
 - If agent got MongoDB duplicate exception while saving Item in DB, then we have to add current JobId into that existing DB Item's JobId array
+- application.properties env. specific paths, secret token, etc should come from script file and not hardcoded and committed in application.properties
 
 Endsites: Myntra, Amazon, Flipkart, Nykaa, Koovs (new) 
 

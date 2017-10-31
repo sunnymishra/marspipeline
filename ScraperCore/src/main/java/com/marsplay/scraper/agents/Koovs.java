@@ -92,7 +92,7 @@ public class Koovs extends Agent {
 
 		long start = System.currentTimeMillis();
 		saveScrapedHtml(document, job.getId()); // Saving Scraped Html
-		LOGGER.info(Util.logTime(job, endsite, "SAVE_KOOVS_HTML", start));
+		LOGGER.info(Util.logTime(job, endsite, "SAVE_HTML", start));
 
 		Elements scripts = document.select("script"); // Get the script part
 		DocumentContext json = null;

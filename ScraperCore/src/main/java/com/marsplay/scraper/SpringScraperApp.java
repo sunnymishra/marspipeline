@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marspipeline.scraper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,9 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = { "com.marsplay.scraper",
-		"com.marsplay.repository" })
-@EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
+@SpringBootApplication(scanBasePackages = { "com.marspipeline.scraper",
+		"com.marspipeline.repository" })
+@EnableMongoRepositories(basePackages = { "com.marspipeline.repository" })
 public class SpringScraperApp{
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpringScraperApp.class);
 

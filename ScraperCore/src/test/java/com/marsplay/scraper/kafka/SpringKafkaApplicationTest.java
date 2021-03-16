@@ -1,4 +1,4 @@
-//package com.marsplay.scraper.kafka;
+//package com.marspipeline.scraper.kafka;
 //
 //import static org.assertj.core.api.Assertions.assertThat;
 //
@@ -18,7 +18,7 @@
 //import org.springframework.test.annotation.DirtiesContext;
 //import org.springframework.test.context.junit4.SpringRunner;
 //
-//import com.marsplay.repository.Job;
+//import com.marspipeline.repository.Job;
 //
 //@RunWith(SpringRunner.class)
 //@SpringBootTest

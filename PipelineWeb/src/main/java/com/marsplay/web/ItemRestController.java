@@ -1,4 +1,4 @@
-package com.marsplay.web;
+package com.marspipeline.web;
 
 import java.net.URI;
 import java.util.Optional;
@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.marsplay.repository.Item;
-import com.marsplay.repository.ItemRepository;
+import com.marspipeline.repository.Item;
+import com.marspipeline.repository.ItemRepository;
 
 @RestController
 @RequestMapping("/item")

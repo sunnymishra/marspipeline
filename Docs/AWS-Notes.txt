@@ -1,5 +1,5 @@
-DNS: ec2-54-198-81-152.compute-1.amazonaws.com
-IP:  54.198.81.152
+Aws DNS: 
+Aws IP:
 
 sudo apt-get update
 sudo apt-get upgrade

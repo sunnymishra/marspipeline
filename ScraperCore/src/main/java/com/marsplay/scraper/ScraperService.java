@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marspipeline.scraper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,16 +24,16 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import com.cloudinary.Cloudinary;
-import com.marsplay.repository.ItemRepository;
-import com.marsplay.repository.Job;
-import com.marsplay.repository.JobRepository;
-import com.marsplay.repository.lib.Constants.JobStatus;
-import com.marsplay.scraper.agents.Agent;
-import com.marsplay.scraper.lib.CloudinarySingleton;
-import com.marsplay.scraper.lib.Constants;
-import com.marsplay.scraper.lib.Constants.Endsites;
-import com.marsplay.scraper.lib.ExecutorServiceExt;
-import com.marsplay.scraper.lib.Util;
+import com.marspipeline.repository.ItemRepository;
+import com.marspipeline.repository.Job;
+import com.marspipeline.repository.JobRepository;
+import com.marspipeline.repository.lib.Constants.JobStatus;
+import com.marspipeline.scraper.agents.Agent;
+import com.marspipeline.scraper.lib.CloudinarySingleton;
+import com.marspipeline.scraper.lib.Constants;
+import com.marspipeline.scraper.lib.Constants.Endsites;
+import com.marspipeline.scraper.lib.ExecutorServiceExt;
+import com.marspipeline.scraper.lib.Util;
 
 @Component
 public class ScraperService implements CommandLineRunner {

@@ -1,13 +1,12 @@
 # Introduction #
 
-This git project will provide solition to On-Demand and Batch process based Endsite scraping. For On-Demand method it will expose Rest API 
-Endpoints which will be consumed by other clients.
+This git project provides an On-Demand Batch processing engine which scrapes data from Endsite such as popule eCommerce websites in India e.g Myntra, Amazon, Flipkart. Engine also exposes Rest API Endpoints for consumers to create request in the pipeline using internal Kafka messaging queue.
 
 ### What is this repository for? ###
 
 * Quick summary
 * Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+* [Learn Markdown](https://github.com/tutorials/markdowndemo)
 
 ### How do I get set up? ###
 
@@ -24,5 +23,4 @@ Endpoints which will be consumed by other clients.
 
 ### Who do I talk to? ###
 
-* This Repo is owned by Marsplay team
-* Repo owner : shival@marsplay.co
+* Repo owner : sunny mishra

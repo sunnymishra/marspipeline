@@ -1,4 +1,4 @@
-package com.marsplay.repository;
+package com.marspipeline.repository;
 
 import java.util.Date;
 

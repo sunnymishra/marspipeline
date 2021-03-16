@@ -1,4 +1,4 @@
-package com.marsplay.scraper.kafka;
+package com.marspipeline.scraper.kafka;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
-import com.marsplay.repository.Job;
+import com.marspipeline.repository.Job;
 
 @Component
 public class TestKafkaSender {

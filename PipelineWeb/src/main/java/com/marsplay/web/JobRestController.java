@@ -1,4 +1,4 @@
-package com.marsplay.web;
+package com.marspipeline.web;
 
 import java.util.HashMap;
 import java.util.List;
@@ -19,11 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.marsplay.repository.Job;
-import com.marsplay.repository.JobRepository;
-import com.marsplay.repository.lib.Constants.JobStatus;
-import com.marsplay.web.kafka.KafkaSender;
-import com.marsplay.web.lib.Util;
+import com.marspipeline.repository.Job;
+import com.marspipeline.repository.JobRepository;
+import com.marspipeline.repository.lib.Constants.JobStatus;
+import com.marspipeline.web.kafka.KafkaSender;
+import com.marspipeline.web.lib.Util;
 
 @RestController
 @RequestMapping("/job")

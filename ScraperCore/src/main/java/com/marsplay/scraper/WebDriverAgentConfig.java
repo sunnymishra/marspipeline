@@ -1,4 +1,4 @@
-package com.marsplay.scraper;
+package com.marspipeline.scraper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,9 +20,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.marsplay.scraper.agents.Agent;
-import com.marsplay.scraper.lib.Constants;
-import com.marsplay.scraper.lib.Constants.Endsites;
+import com.marspipeline.scraper.agents.Agent;
+import com.marspipeline.scraper.lib.Constants;
+import com.marspipeline.scraper.lib.Constants.Endsites;
 
 @Configuration
 public class WebDriverAgentConfig {

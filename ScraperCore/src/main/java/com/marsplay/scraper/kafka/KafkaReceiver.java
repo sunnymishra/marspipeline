@@ -1,4 +1,4 @@
-package com.marsplay.scraper.kafka;
+package com.marspipeline.scraper.kafka;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
@@ -12,9 +12,9 @@ import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
-import com.marsplay.repository.Job;
-import com.marsplay.scraper.ScraperService;
-import com.marsplay.scraper.lib.Util;
+import com.marspipeline.repository.Job;
+import com.marspipeline.scraper.ScraperService;
+import com.marspipeline.scraper.lib.Util;
 
 @Component
 public class KafkaReceiver {

@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>com.marsplay</groupId>
+		<groupId>com.marspipeline</groupId>
 		<artifactId>ScraperParent</artifactId>
 		<version>1.0.0</version>
 		<relativePath>../ScraperParent</relativePath>
@@ -19,7 +19,7 @@
 	<dependencies>
 		<!-- Below own module dependencies -->
 		<dependency>
-			<groupId>com.marsplay</groupId>
+			<groupId>com.marspipeline</groupId>
 			<artifactId>PipelineRepository</artifactId>
 			<version>1.0.0</version>
 		</dependency>
@@ -100,7 +100,7 @@
 							<goal>java</goal>
 						</goals>
 						<configuration>
-							<mainClass>com.marsplay.scraper.SpringScraperApp</mainClass>
+							<mainClass>com.marspipeline.scraper.SpringScraperApp</mainClass>
 						</configuration>
 					</execution>
 				</executions>

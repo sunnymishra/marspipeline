@@ -1,10 +1,10 @@
-package com.marsplay.scraper.lib;
+package com.marspipeline.scraper.lib;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import com.marsplay.scraper.ScraperService;
+import com.marspipeline.scraper.ScraperService;
 
 public class Constants {
 	private static Properties businessProp, applicationProp;

@@ -1,4 +1,4 @@
-package com.marsplay.scraper.lib;
+package com.marspipeline.scraper.lib;
 
 import static java.util.stream.Collectors.toList;
 

@@ -1,4 +1,4 @@
-package com.marsplay.web;
+package com.marspipeline.web;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,9 +6,9 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
-@SpringBootApplication(scanBasePackages = { "com.marsplay.web",
-		"com.marsplay.repository" })
-@EnableMongoRepositories(basePackages = { "com.marsplay.repository" })
+@SpringBootApplication(scanBasePackages = { "com.marspipeline.web",
+		"com.marspipeline.repository" })
+@EnableMongoRepositories(basePackages = { "com.marspipeline.repository" })
 public class SpringWebApp {
 
 	public static void main(String[] args) throws Exception {

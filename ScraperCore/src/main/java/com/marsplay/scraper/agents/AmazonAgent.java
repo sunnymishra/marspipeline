@@ -1,4 +1,4 @@
-package com.marsplay.scraper.agents;
+package com.marspipeline.scraper.agents;
 
 import java.math.BigDecimal;
 import java.text.NumberFormat;
@@ -23,12 +23,12 @@ import org.springframework.stereotype.Service;
 
 import us.codecraft.xsoup.Xsoup;
 
-import com.marsplay.repository.Item;
-import com.marsplay.repository.ItemRepository;
-import com.marsplay.repository.Job;
-import com.marsplay.scraper.ScraperService;
-import com.marsplay.scraper.lib.Constants.Endsites;
-import com.marsplay.scraper.lib.Util;
+import com.marspipeline.repository.Item;
+import com.marspipeline.repository.ItemRepository;
+import com.marspipeline.repository.Job;
+import com.marspipeline.scraper.ScraperService;
+import com.marspipeline.scraper.lib.Constants.Endsites;
+import com.marspipeline.scraper.lib.Util;
 import com.mongodb.DuplicateKeyException;
 
 @Service("amazonAgent")

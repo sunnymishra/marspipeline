@@ -1,4 +1,4 @@
-package com.marsplay.scraper.agents;
+package com.marspipeline.scraper.agents;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,15 +30,15 @@ import org.slf4j.LoggerFactory;
 
 import com.cloudinary.utils.ObjectUtils;
 import com.google.common.base.Function;
-import com.marsplay.repository.Item;
-import com.marsplay.repository.Job;
-import com.marsplay.scraper.lib.CloudinarySingleton;
-import com.marsplay.scraper.lib.Constants;
-import com.marsplay.scraper.lib.Constants.ElementType;
-import com.marsplay.scraper.lib.Constants.Endsites;
-import com.marsplay.scraper.lib.Constants.ItemAttribute;
-import com.marsplay.scraper.lib.FluentElementWait;
-import com.marsplay.scraper.lib.Util;
+import com.marspipeline.repository.Item;
+import com.marspipeline.repository.Job;
+import com.marspipeline.scraper.lib.CloudinarySingleton;
+import com.marspipeline.scraper.lib.Constants;
+import com.marspipeline.scraper.lib.Constants.ElementType;
+import com.marspipeline.scraper.lib.Constants.Endsites;
+import com.marspipeline.scraper.lib.Constants.ItemAttribute;
+import com.marspipeline.scraper.lib.FluentElementWait;
+import com.marspipeline.scraper.lib.Util;
 
 public abstract class Agent implements Callable<String> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Agent.class);

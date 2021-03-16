@@ -6,9 +6,6 @@ APL(aggregation pipeline):
 - Nightly Batch job to update Datastore with latest Image and price info. Remove item from Datastore if Endsite doesn't support
 - Weekly Batch job to delete Screenshot and Logs which are older than 1 week. Also roll Selenium nohup.log file without restating selenium standalone server.
 - Flagging and Alert system (Send SMS or Email) if Scraping is failing. Reads from scraperapp.log and selenium nohup.log file to identify errors and creates Report HTML every 30 mints. Emails if errors are more (define more). Also priority given to OrderBot than APL
-- Datastore entry should have a flag if image is also uploaded or not. So that App can fetch everything including image in 1st call or 
-App can fetch everything else in 1st call and then later fetch image.
-- APL should be available as a microservice ??????????
 - How to return error codes in response to the App. Need to log all requests into DB
 - OptimisticThread - go check Lucene and return    LaboriousThread - go scrape Endsite
 - JOB table: Maintain status for each Endsite to return values fast for consumption
@@ -35,9 +32,9 @@ items[]
 
 {signature=caf5f7a62b6ca96869da8d20d03e55b87f362f70, 
 format=jpg, resource_type=image, 
-secure_url=https://res.cloudinary.com/marsplay-co/image/upload/v1503998705/vf2qarw7eafnwxih9ggy.jpg, 
+secure_url=https://res.cloudinary.com/mars/image/upload/v1503998705/vf2qarw7eafnwxih9ggy.jpg, 
 created_at=2017-08-29T09:25:05Z, type=upload, version=1503998705, 
-url=http://res.cloudinary.com/marsplay-co/image/upload/v1503998705/vf2qarw7eafnwxih9ggy.jpg, 
+url=http://res.cloudinary.com/mars/image/upload/v1503998705/vf2qarw7eafnwxih9ggy.jpg, 
 public_id=vf2qarw7eafnwxih9ggy, tags=[myntra], 
 original_filename=11482126737792-Floyd-Unisex-Aviator-sunglasses-4581482126737672-1_mini, 
 bytes=2769, width=180, 

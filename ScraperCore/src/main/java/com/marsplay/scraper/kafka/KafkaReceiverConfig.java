@@ -1,4 +1,4 @@
-package com.marsplay.scraper.kafka;
+package com.marspipeline.scraper.kafka;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.marsplay.repository.Job;
+import com.marspipeline.repository.Job;
 
 @Configuration
 @EnableKafka

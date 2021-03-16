@@ -1,4 +1,4 @@
-package com.marsplay.web;
+package com.marspipeline.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

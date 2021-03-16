@@ -1,4 +1,4 @@
-package com.marsplay.scraper.lib;
+package com.marspipeline.scraper.lib;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -8,8 +8,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.marsplay.repository.Job;
-import com.marsplay.scraper.lib.Constants.Endsites;
+import com.marspipeline.repository.Job;
+import com.marspipeline.scraper.lib.Constants.Endsites;
 
 public class Util {
 	private static final Logger LOGGER = LoggerFactory
